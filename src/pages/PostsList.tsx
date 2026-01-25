@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { getPosts } from "../api/posts.api";
+import type { Post } from "../types/post";
 
 // Questo componente rappresenta la pagina che mostra la lista dei post
 export default function PostsList() {
 
   // Stato che contiene i post ricevuti dal backend
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   // Stato che indica se stiamo ancora caricando i dati
   const [loading, setLoading] = useState(true);
