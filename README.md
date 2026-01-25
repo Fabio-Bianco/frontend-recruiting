@@ -50,7 +50,7 @@ Librerie di supporto:
 Il progetto utilizza **json-server** per simulare un backend REST.
 
 ```bash
-npx json-server --watch db.json --port 3001
+npx json-server --watch fake-backend/db.json --port 3001
 ```
 (Terminale 1)
 
