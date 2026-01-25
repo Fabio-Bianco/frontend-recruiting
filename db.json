@@ -1,0 +1,71 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Mario Rossi",
+      "email": "mario@example.com",
+      "password": "password123"
+    },
+    {
+      "id": 2,
+      "name": "Luigi Bianchi",
+      "email": "luigi@example.com",
+      "password": "password456"
+    },
+    {
+      "id": 3,
+      "name": "Giulia Verdi",
+      "email": "giulia@example.com",
+      "password": "password789"
+    },
+    {
+      "id": 4,
+      "name": "Marco Ferrari",
+      "email": "marco@example.com",
+      "password": "password101"
+    },
+    {
+      "id": 5,
+      "name": "Anna Romano",
+      "email": "anna@example.com",
+      "password": "password202"
+    }
+  ],
+  "posts": [
+    {
+      "id": 1,
+      "userId": 1,
+      "title": "Il mio primo post",
+      "content": "Contenuto di esempio",
+      "createdAt": "2025-01-10T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "userId": 2,
+      "title": "Introduzione a React",
+      "content": "React è una libreria JavaScript per costruire interfacce utente",
+      "createdAt": "2025-01-15T14:20:00Z"
+    },
+    {
+      "id": 3,
+      "userId": 3,
+      "title": "TypeScript per principianti",
+      "content": "TypeScript aggiunge tipizzazione statica a JavaScript",
+      "createdAt": "2025-01-18T09:45:00Z"
+    },
+    {
+      "id": 4,
+      "userId": 4,
+      "title": "Guida a Vite",
+      "content": "Vite è un build tool veloce e moderno per progetti web",
+      "createdAt": "2025-01-20T16:30:00Z"
+    },
+    {
+      "id": 5,
+      "userId": 5,
+      "title": "Best practices CSS",
+      "content": "Consigli per scrivere CSS mantenibile e scalabile",
+      "createdAt": "2025-01-22T11:00:00Z"
+    }
+  ]
+}
