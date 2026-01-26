@@ -9,3 +9,9 @@ export async function getUsers(): Promise<User[]> {
   
   return response.data;
 }
+
+// Funzione che recupera un singolo post dato il suo ID
+export async function getUserById(id: string): Promise<User> {
+  const { data } = await apiClient.get<User>(`/users/${id}`);
+  return data;
+}

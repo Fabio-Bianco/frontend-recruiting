@@ -16,6 +16,8 @@ import Navbar from "./components/Navbar";
 // Importiamo il componente della pagina di dettaglio del post
 import PostsDetails from "./pages/PostsDetails";
 
+import UserDetail from "./pages/UserDeatil";
+
 
 
 // App è il componente root dell’applicazione.
@@ -28,6 +30,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/posts/:id" element={<PostsDetails />} />
+        <Route path="/users/:id" element={<UserDetail />} />
         <Route path="/posts" element={<PostsList />} />
         <Route path="/users" element={<UsersList />} />
       </Routes>
