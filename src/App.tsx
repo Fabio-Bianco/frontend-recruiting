@@ -1,53 +1,30 @@
-//importazione Router
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import RequireAuth from "./auth/RequireAuth";
+import ProtectedLayout from "./layouts/ProtectedLayout";
 
-// Import del componente principale della homepage
+import Login from "./pages/LoginUser";
 import Home from "./pages/Home";
-
-// Import del componente principale della pagina dei post.
 import PostsList from "./pages/PostsList";
-
-// Import del componente principale della pagina utenti 
-import UsersList from "./pages/UsersList";
-
-// Import del componente della pagina di dettaglio del post
-import Navbar from "./components/Navbar";
-
-// Import del componente della pagina di dettaglio del post
 import PostsDetails from "./pages/details/PostsDetails";
-
+import UsersList from "./pages/UsersList";
 import UserDetail from "./pages/details/UserDetail";
 
-
-
-
-// App è il componente root dell’applicazione.
-// Tutta l’app React parte da qui.
-function App() {
+export default function App() {
   return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
 
-    // Configurazione del Router per la navigazione tra le pagine
-    <BrowserRouter>
-
-
-      <Navbar />
-
-
-      <Routes>
-
-        <Route path="/" element={<Home />} />
-
-        <Route path="/posts" element={<PostsList />} />
-        <Route path="/posts/:id" element={<PostsDetails />} />
-
-        <Route path="/users" element={<UsersList />} />
-        <Route path="/users/:id" element={<UserDetail />} />
-      </Routes>
-    </BrowserRouter>
-
+      {/* 1) guard auth */}
+      <Route element={<RequireAuth />}>
+        {/* 2) layout UI */}
+        <Route element={<ProtectedLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/posts" element={<PostsList />} />
+          <Route path="/posts/:id" element={<PostsDetails />} />
+          <Route path="/users" element={<UsersList />} />
+          <Route path="/users/:id" element={<UserDetail />} />
+        </Route>
+      </Route>
+    </Routes>
   );
 }
-
-
-// Rendiamo App disponibile al resto dell’app (main.tsx lo userà)
-export default App;
