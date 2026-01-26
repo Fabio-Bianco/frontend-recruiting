@@ -7,15 +7,29 @@ import type { Post } from "../types/post";
 export default function PostsDetails() {
   const { id } = useParams();
   const [post, setPost] = useState<Post | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadPost() {
-      if (!id) return;                // protezione: id potrebbe mancare
+useEffect(() => {
+  async function loadPost() {
+    if (!id) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
       const data = await getPostById(id);
       setPost(data);
+    } catch (err) {
+      setError("Errore nel caricamento del post.");
+      setPost(null);
+    } finally {
+      setLoading(false);
     }
-    loadPost();
-  }, [id]);
+  }
+
+  loadPost();
+}, [id]);
 
   if (!post) return <p>Caricamento...</p>;
 
