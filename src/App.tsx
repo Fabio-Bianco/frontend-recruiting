@@ -26,17 +26,23 @@ import UserDetail from "./pages/details/UserDetail";
 function App() {
   return (
 
+    // Configurazione del Router per la navigazione tra le pagine
     <BrowserRouter>
-  <Navbar />
-<Routes>
-  <Route path="/" element={<Home />} />
 
-  <Route path="/posts" element={<PostsList />} />
-  <Route path="/posts/:id" element={<PostsDetails />} />
+    // Barra di navigazione principale
+      <Navbar />
 
-  <Route path="/users" element={<UsersList />} />
-  <Route path="/users/:id" element={<UserDetail />} />
-</Routes>
+  // Definizione delle rotte dell’app
+      <Routes>
+  // Rotta singola per ogni pagina
+        <Route path="/" element={<Home />} />
+
+        <Route path="/posts" element={<PostsList />} />
+        <Route path="/posts/:id" element={<PostsDetails />} />
+
+        <Route path="/users" element={<UsersList />} />
+        <Route path="/users/:id" element={<UserDetail />} />
+      </Routes>
     </BrowserRouter>
 
   );
