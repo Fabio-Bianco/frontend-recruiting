@@ -49,18 +49,22 @@ Librerie di supporto:
 ## 🧪 Backend fake
 Il progetto utilizza **json-server** per simulare un backend REST.
 
+(Terminale 1)
+
 ```bash
 npx json-server --watch fake-backend/db.json --port 3001
 ```
-(Terminale 1)
+
 
 ## 🚀 Frontend
 Avviare l'applicazione React:
 
+(Terminale 2)
+
 ```bash
 npm run dev
 ```
-(Terminale 2)
+
 
 
 
