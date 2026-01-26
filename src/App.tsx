@@ -1,19 +1,19 @@
 //importazione Router
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-// Importiamo il componente principale della homepage
+// Import del componente principale della homepage
 import Home from "./pages/Home";
 
-// Importiamo il componente principale della pagina dei post.
+// Import del componente principale della pagina dei post.
 import PostsList from "./pages/PostsList";
 
-// Importiamo anche il componente della pagina utenti 
+// Import del componente principale della pagina utenti 
 import UsersList from "./pages/UsersList";
 
-// Importiamo il componente della pagina di dettaglio del post
+// Import del componente della pagina di dettaglio del post
 import Navbar from "./components/Navbar";
 
-// Importiamo il componente della pagina di dettaglio del post
+// Import del componente della pagina di dettaglio del post
 import PostsDetails from "./pages/PostsDetails";
 
 import UserDetail from "./pages/UserDeatil";
