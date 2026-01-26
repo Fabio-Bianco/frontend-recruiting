@@ -1,96 +1,230 @@
-//import React e gli hook necessari
-import { useEffect, useState } from "react";
+// src/pages/PostsList.tsx
+import { useEffect, useMemo, useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 
-//import Material React Table
+// MUI
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Stack,
+  Typography,
+} from "@mui/material";
+
+// Material React Table
 import { MaterialReactTable } from "material-react-table";
-
-// Import della funzione che recupera i post dal backend
-import { getPosts } from "../api/posts.api";
-
-// Import del tipo Post
-import type { Post } from "../types/post";
-
-// Import del componente Link per la navigazione
-import { Link } from "react-router-dom";
-
-// Import dei tipi di Material React Table
-import type { MRT_ColumnDef } from "material-react-table";
-
 import type {
-  MRT_ColumnFilterFnsState,
+  MRT_ColumnDef,
   MRT_PaginationState,
   MRT_SortingState,
 } from "material-react-table";
 
+// ✅ I tuoi tipi (adatta il path)
+import type { Post } from "../types/post";
 
+// ✅ Le tue API (adatta il path + nome funzione)
+import { getPosts } from "../api/posts.api";
 
-// Questo componente rappresenta la pagina che mostra la lista dei post
 export default function PostsList() {
-
-  // -----------------------------
-  // 1) DATA (i post dal backend)
-  // -----------------------------
-
-  // Stato che contiene i post ricevuti dal backend
+  /**
+   * =========================================================
+   * STATE "DATI" (FETCH)
+   * =========================================================
+   * Questi sono i dati veri (posts) che arrivano dal backend fake.
+   */
   const [posts, setPosts] = useState<Post[]>([]);
-  // Stato per il caricamento
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  /**
+   * =========================================================
+   * STATE UI DELLA TABELLA CON PERSISTENZA SEMPLICE
+   * =========================================================
+   * Manteniamo solo la paginazione con persistenza basilare.
+   * Se fallisce il parsing, usa i valori di default.
+   */
+  const [pagination, setPagination] = useState<MRT_PaginationState>(() => {
+    // Ripristina solo la paginazione, ignora errori
+    try {
+      const saved = sessionStorage.getItem("posts-pagination");
+      return saved ? JSON.parse(saved) : { pageIndex: 0, pageSize: 10 };
+    } catch {
+      return { pageIndex: 0, pageSize: 10 };
+    }
+  });
 
-  // -----------------------------
-  // 2) TABLE STATE (stato tabella)
-  // -----------------------------
+  const [sorting, setSorting] = useState<MRT_SortingState>(() => {
+    try {
+      const saved = sessionStorage.getItem("posts-sorting");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  })
 
-
-
-
-
-
-  // -----------------------------
-  // 3) LOAD DATA (fetch posts)
-  // -----------------------------
-
-  // useEffect viene eseguito una sola volta quando il componente viene montato
+  /**
+   * =========================================================
+   * SALVATAGGIO AUTOMATICO DELLA PAGINAZIONE
+   * =========================================================
+   * Ogni volta che cambia la paginazione, la salviamo automaticamente.
+   */
   useEffect(() => {
-    // Funzione asincrona che carica i post
-    async function loadPosts() {
-      // Recuperiamo i dati dal backend
-      const data = await getPosts();
+    try {
+      sessionStorage.setItem("posts-pagination", JSON.stringify(pagination));
+    } catch {
+      // Ignora errori di storage (quota piena, browser policy, etc.)
+    }
+  }, [pagination]);
 
-      // Salviamo i post nello stato
-      setPosts(data);
+  useEffect(() => {
+  try {
+    sessionStorage.setItem("posts-sorting", JSON.stringify(sorting));
+  } catch {}
+}, [sorting]);
 
-      // Disattiviamo il loading
-      setLoading(false);
+  /**
+   * =========================================================
+   * FETCH POSTS
+   * =========================================================
+   * Fetch semplice, dichiarativo.
+   * In caso di errore settiamo errorMsg.
+   */
+  useEffect(() => {
+    let isMounted = true; // micro-protezione (evita setState dopo un unmount)
+
+    async function fetchPosts() {
+      setLoading(true);
+      setErrorMsg(null);
+
+      try {
+        const data = await getPosts();
+        if (!isMounted) return;
+        setPosts(data);
+      } catch (err) {
+        if (!isMounted) return;
+        setErrorMsg("Errore nel caricamento dei posts.");
+      } finally {
+        if (!isMounted) return;
+        setLoading(false);
+      }
     }
 
-    // Avviamo il caricamento
-    loadPosts();
+    fetchPosts();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Finché i dati non sono pronti mostriamo un messaggio di caricamento
+  /**
+   * =========================================================
+   * DEFINIZIONE COLONNE (TIPIZZATE!)
+   * =========================================================
+   * useMemo evita di ricreare le colonne ad ogni render.
+   * Non è obbligatorio, ma è buona pratica e aiuta performance / stabilità.
+   *
+   * Importante: MRT_ColumnDef<Post>[] garantisce che accessorKey sia
+   * compatibile con i campi di Post (riduce bug e typo).
+   */
+  const columns = useMemo <MRT_ColumnDef<Post>[]>(
+    () => [
+      {
+        header: "ID",
+        accessorKey: "id",
+        size: 80,
+      },
+      {
+        header: "Titolo",
+        accessorKey: "title",
+      },
+      {
+        header: "UserId",
+        accessorKey: "userId",
+        size: 90,
+      },
+      {
+        header: "Creato il",
+        accessorKey: "createdAt",
+        // Esempio: se vuoi formattare in futuro, qui puoi usare Cell()
+      },
+      {
+        /**
+         * Colonna "Dettagli"
+         * - non ha accessorKey perché non legge un campo diretto
+         * - usa row.original (che è Post, grazie alla tipizzazione)
+         */
+        header: "Dettagli",
+        id: "details", // id esplicito, così MRT non deve inventarlo
+        size: 120,
+        Cell: ({ row }) => (
+          <Button
+            component={RouterLink}
+            to={`/posts/${row.original.id}`}
+            variant="outlined"
+            size="small"
+          >
+            Apri
+          </Button>
+        ),
+      },
+    ],
+  []
+  );
+
+  /**
+   * =========================================================
+   * RENDER: loading / error / tabella
+   * =========================================================
+   */
   if (loading) {
-    return <p>Caricamento...</p>;
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
+        <CircularProgress />
+      </Box>
+    );
   }
 
-  // Definizione delle colonne per Material React Table
-  //MRT_ColumnDef<Post> tipizza columns come la colonna dei post
-  const columns: MRT_ColumnDef<Post>[] = [
-    { accessorKey: "title", header: "Titolo" },
-    { accessorKey: "userId", header: "User ID" },
-    {
-      header: "Dettagli",
-      Cell: ({ row }) => <Link to={`/posts/${row.original.id}`}>Dettagli</Link>,
-    },
-  ];
+  if (errorMsg) {
+    return (
+      <Box sx={{ mt: 4 }}>
+        <Typography color="error">{errorMsg}</Typography>
+      </Box>
+    );
+  }
 
-  //row.original.id accede all'id del post originale
-
-  // Quando i dati sono disponibili, renderizziamo la lista
   return (
-    <div>
-      <h1>Lista Post</h1>
-      <MaterialReactTable columns={columns} data={posts} />
-    </div>
+    <Box>
+      {/* Header pagina */}
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ mb: 2 }}
+      >
+        <Typography variant="h4">Posts</Typography>
+
+        {/* Questo bottone oggi non fa nulla: lo userai per il Drawer CRUD */}
+        <Button variant="contained">
+          Nuovo Post
+        </Button>
+      </Stack>
+
+      {/* Material React Table con persistenza semplificata */}
+      <MaterialReactTable
+        columns={columns}
+        data={posts}
+      
+        state={{
+          pagination,
+          sorting
+        }}
+ 
+        onPaginationChange={setPagination}
+        onSortingChange={setSorting}
+        enableGlobalFilter
+      />
+
+      
+    </Box>
   );
 }
