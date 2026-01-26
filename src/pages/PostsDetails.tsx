@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { useParams } from "react-router-dom";
 import { getPostById } from "../api/posts.api";
 import type { Post } from "../types/post";
@@ -10,28 +11,41 @@ export default function PostsDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-useEffect(() => {
-  async function loadPost() {
-    if (!id) return;
+  useEffect(() => {
+    async function loadPost() {
+      if (!id) return;
 
-    setLoading(true);
-    setError(null);
+      setLoading(true);
+      setError(null);
 
-    try {
-      const data = await getPostById(id);
-      setPost(data);
-    } catch (err) {
-      setError("Errore nel caricamento del post.");
-      setPost(null);
-    } finally {
-      setLoading(false);
+      try {
+        const data = await getPostById(id);
+        setPost(data);
+      } catch (err) {
+
+        const status = (err as any)?.response?.status;
+        if (status === 404) {
+
+          setError("Post non trovato.");
+
+        } else {
+
+          setError("Errore nel caricamento del post.");
+        }
+        setPost(null);
+
+      } finally {
+
+        setLoading(false);
+      }
     }
-  }
 
-  loadPost();
-}, [id]);
+    loadPost();
+  }, [id]);
 
-  if (!post) return <p>Caricamento...</p>;
+  if (loading) return <p>Caricamento...</p>;
+  if (error) return <p>{error}</p>;
+  if (!post) return <p>Post non trovato.</p>;
 
   return (
     <div>
