@@ -17,6 +17,7 @@ import type {
   MRT_ColumnDef,
   MRT_PaginationState,
   MRT_SortingState,
+  MRT_ColumnFiltersState,
 } from "material-react-table";
 
 // ✅ I tuoi tipi (adatta il path)
@@ -24,6 +25,19 @@ import type { Post } from "../types/post";
 
 // ✅ Le tue API (adatta il path + nome funzione)
 import { getPosts } from "../api/posts.api";
+
+// ✅ Storage utilities
+import { readFromSessionStorage, writeToSessionStorage } from "../utils/storage";
+
+// Tipo per lo stato persistente della tabella
+type PostsTableStatePersisted = {
+  pagination: MRT_PaginationState;
+  sorting: MRT_SortingState;
+  columnFilters: MRT_ColumnFiltersState;
+  globalFilter: string;
+};
+
+const POSTS_TABLE_STORAGE_KEY = "postsTableState.v1";
 
 export default function PostsList() {
   /**
@@ -38,49 +52,45 @@ export default function PostsList() {
 
   /**
    * =========================================================
-   * STATE UI DELLA TABELLA CON PERSISTENZA SEMPLICE
+   * STATE UI DELLA TABELLA CON PERSISTENZA COMPLETA
    * =========================================================
-   * Manteniamo solo la paginazione con persistenza basilare.
-   * Se fallisce il parsing, usa i valori di default.
+   * Persistenza di: pagination, sorting, columnFilters, globalFilter
    */
-  const [pagination, setPagination] = useState<MRT_PaginationState>(() => {
-    // Ripristina solo la paginazione, ignora errori
-    try {
-      const saved = sessionStorage.getItem("posts-pagination");
-      return saved ? JSON.parse(saved) : { pageIndex: 0, pageSize: 10 };
-    } catch {
-      return { pageIndex: 0, pageSize: 10 };
-    }
-  });
+  const saved = readFromSessionStorage<PostsTableStatePersisted>(
+    POSTS_TABLE_STORAGE_KEY
+  );
 
-  const [sorting, setSorting] = useState<MRT_SortingState>(() => {
-    try {
-      const saved = sessionStorage.getItem("posts-sorting");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  })
+  const [pagination, setPagination] = useState<MRT_PaginationState>(
+    saved?.pagination ?? { pageIndex: 0, pageSize: 10 }
+  );
+
+  const [sorting, setSorting] = useState<MRT_SortingState>(
+    saved?.sorting ?? []
+  );
+
+  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
+    saved?.columnFilters ?? []
+  );
+
+  const [globalFilter, setGlobalFilter] = useState<string>(
+    saved?.globalFilter ?? ""
+  );
 
   /**
    * =========================================================
-   * SALVATAGGIO AUTOMATICO DELLA PAGINAZIONE
+   * SALVATAGGIO AUTOMATICO DELLO STATO TABELLA
    * =========================================================
-   * Ogni volta che cambia la paginazione, la salviamo automaticamente.
+   * Ogni volta che cambia lo stato, salviamo tutto automaticamente.
    */
   useEffect(() => {
-    try {
-      sessionStorage.setItem("posts-pagination", JSON.stringify(pagination));
-    } catch {
-      // Ignora errori di storage (quota piena, browser policy, etc.)
-    }
-  }, [pagination]);
-
-  useEffect(() => {
-  try {
-    sessionStorage.setItem("posts-sorting", JSON.stringify(sorting));
-  } catch {}
-}, [sorting]);
+    const payload: PostsTableStatePersisted = {
+      pagination,
+      sorting,
+      columnFilters,
+      globalFilter,
+    };
+    writeToSessionStorage(POSTS_TABLE_STORAGE_KEY, payload);
+  }, [pagination, sorting, columnFilters, globalFilter]);
 
   /**
    * =========================================================
@@ -209,19 +219,21 @@ export default function PostsList() {
         </Button>
       </Stack>
 
-      {/* Material React Table con persistenza semplificata */}
+      {/* Material React Table con persistenza completa */}
       <MaterialReactTable
         columns={columns}
         data={posts}
-      
+        enableGlobalFilter
         state={{
           pagination,
-          sorting
+          sorting,
+          columnFilters,
+          globalFilter,
         }}
- 
         onPaginationChange={setPagination}
         onSortingChange={setSorting}
-        enableGlobalFilter
+        onColumnFiltersChange={setColumnFilters}
+        onGlobalFilterChange={setGlobalFilter}
       />
 
       

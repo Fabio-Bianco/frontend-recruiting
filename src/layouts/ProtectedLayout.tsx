@@ -1,15 +1,14 @@
-// src/layouts/ProtectedLayout.tsx
 import { Outlet } from "react-router-dom";
 import { Box } from "@mui/material";
-import Navbar from "../components/Navbar"; // ✅ adatta path
+import Navbar from "../components/Navbar"; 
 
 export default function ProtectedLayout() {
   return (
     <Box>
-      {/* Sempre visibile quando loggato */}
+      {/* Cornice UI sempre presente quando loggato */}
       <Navbar />
 
-      {/* Qui dentro si renderizzano le pagine: Home, Posts, Users, ecc */}
+      {/* Contenuto pagina (Home/Posts/Users/Details...) */}
       <Box sx={{ mt: 2 }}>
         <Outlet />
       </Box>

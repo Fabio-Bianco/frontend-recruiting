@@ -1,8 +1,9 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom"; 
+
 import RequireAuth from "./auth/RequireAuth";
 import ProtectedLayout from "./layouts/ProtectedLayout";
 
-import Login from "./pages/LoginUser";
+import Login from "./pages/Login";
 import Home from "./pages/Home";
 import PostsList from "./pages/PostsList";
 import PostsDetails from "./pages/details/PostsDetails";
@@ -12,11 +13,11 @@ import UserDetail from "./pages/details/UserDetail";
 export default function App() {
   return (
     <Routes>
+      {/* Pubblica */}
       <Route path="/login" element={<Login />} />
 
-      {/* 1) guard auth */}
+      {/* Protette */}
       <Route element={<RequireAuth />}>
-        {/* 2) layout UI */}
         <Route element={<ProtectedLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/posts" element={<PostsList />} />
