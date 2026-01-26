@@ -1,7 +1,20 @@
+//import React e gli hook necessari
 import { useEffect, useState } from "react";
+//import Material React Table
+
+
+// Import della funzione che recupera l'id utente dal backend
 import { useParams } from "react-router-dom";
+
+// Import della funzione che recupera l'utente dal backend
 import { getUserById } from "../api/users.api";
+
+// Import del tipo User
 import type { User } from "../types/user";
+
+
+
+
 
 export default function UserDetail() {
   const { id } = useParams();
@@ -40,6 +53,7 @@ export default function UserDetail() {
   if (loading) return <div>Caricamento in corso...</div>;
   if (error) return <div>{error}</div>;
   if (!user) return <div>Utente non trovato.</div>;
+
 
   return (
     <div>

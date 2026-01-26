@@ -52,7 +52,7 @@ export default function PostsList() {
     { accessorKey: "userId", header: "User ID" },
     {
       header: "Dettagli",
-      Cell: ({ row }: any) => <Link to={`/posts/${row.original.id}`}>Apri</Link>,
+      Cell: ({ row }: any) => <Link to={`/posts/${row.original.id}`}>Dettagli</Link>,
     },
   ];
 
