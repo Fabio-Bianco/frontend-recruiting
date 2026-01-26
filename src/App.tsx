@@ -14,9 +14,10 @@ import UsersList from "./pages/UsersList";
 import Navbar from "./components/Navbar";
 
 // Import del componente della pagina di dettaglio del post
-import PostsDetails from "./pages/PostsDetails";
+import PostsDetails from "./pages/details/PostsDetails";
 
-import UserDetail from "./pages/UserDeatil";
+import { UserDetail } from "./pages/details/UserDeatil";
+
 
 
 
@@ -27,13 +28,15 @@ function App() {
 
     <BrowserRouter>
   <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/posts/:id" element={<PostsDetails />} />
-        <Route path="/users/:id" element={<UserDetail />} />
-        <Route path="/posts" element={<PostsList />} />
-        <Route path="/users" element={<UsersList />} />
-      </Routes>
+<Routes>
+  <Route path="/" element={<Home />} />
+
+  <Route path="/posts" element={<PostsList />} />
+  <Route path="/posts/:id" element={<PostsDetails />} />
+
+  <Route path="/users" element={<UsersList />} />
+  <Route path="/users/:id" element={<UserDetail />} />
+</Routes>
     </BrowserRouter>
 
   );

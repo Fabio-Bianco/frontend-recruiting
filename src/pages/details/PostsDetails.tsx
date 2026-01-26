@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getPostById } from "../api/posts.api";
-import type { Post } from "../types/post";
+import { getPostById } from "../../api/posts.api";
+import type { Post } from "../../types/post";
 
 
 export default function PostsDetails() {

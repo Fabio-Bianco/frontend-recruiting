@@ -1,22 +1,9 @@
-//import React e gli hook necessari
 import { useEffect, useState } from "react";
-//import Material React Table
-
-
-// Import della funzione che recupera l'id utente dal backend
 import { useParams } from "react-router-dom";
+import { getUserById } from "../../api/users.api";
+import type { User } from "../../types/user";
 
-// Import della funzione che recupera l'utente dal backend
-import { getUserById } from "../api/users.api";
-
-// Import del tipo User
-import type { User } from "../types/user";
-
-
-
-
-
-export default function UserDetail() {
+export function UserDetail() {
   const { id } = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,13 +21,7 @@ export default function UserDetail() {
         setUser(data);
       } catch (err) {
         const status = (err as any)?.response?.status;
-
-        if (status === 404) {
-          setError("Utente non trovato.");
-        } else {
-          setError("Errore nel caricamento dell'utente.");
-        }
-
+        setError(status === 404 ? "Utente non trovato." : "Errore nel caricamento dell'utente.");
         setUser(null);
       } finally {
         setLoading(false);
@@ -53,7 +34,6 @@ export default function UserDetail() {
   if (loading) return <div>Caricamento in corso...</div>;
   if (error) return <div>{error}</div>;
   if (!user) return <div>Utente non trovato.</div>;
-
 
   return (
     <div>

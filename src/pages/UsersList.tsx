@@ -46,7 +46,7 @@ const columns = [
     <div>
       <h1>Lista Utenti</h1>
 
-    //
+
       <MaterialReactTable columns={columns} data={users} />
     </div>
   );
