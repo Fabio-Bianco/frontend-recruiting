@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { getPostById } from "../api/posts.api";
 import type { Post } from "../types/post";
 
+
 export default function PostsDetails() {
   const { id } = useParams();
   const [post, setPost] = useState<Post | null>(null);

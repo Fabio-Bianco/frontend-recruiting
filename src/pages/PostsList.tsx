@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getPosts } from "../api/posts.api";
 import type { Post } from "../types/post";
+import { Link } from "react-router-dom"; 
 
 // Questo componente rappresenta la pagina che mostra la lista dei post
 export default function PostsList() {
@@ -45,6 +46,8 @@ export default function PostsList() {
             <strong>{post.title}</strong>
             <br />
             <small>User ID: {post.userId}</small>
+            <br />
+            <Link to={`/posts/${post.id}`}>Dettagli</Link>
           </li>
         ))}
       </ul>
