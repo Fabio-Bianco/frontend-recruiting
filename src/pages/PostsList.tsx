@@ -47,6 +47,7 @@ export default function PostsList() {
     return <p>Caricamento...</p>;
   }
 
+  // Definizione delle colonne per Material React Table
   const columns = [
     { accessorKey: "title", header: "Titolo" },
     { accessorKey: "userId", header: "User ID" },
