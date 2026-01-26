@@ -25,10 +25,16 @@ export default function UsersList() {
     return <p>Caricamento...</p>;
   }
 
-  const columns = [
-    { accessorKey: "name", header: "Nome" },
-    { accessorKey: "email", header: "Email" },
-  ];
+const columns = [
+  {
+    accessorKey: "name",
+    header: "Nome",
+    Cell: ({ row }: any) => (
+      <Link to={`/users/${row.original.id}`}>{row.original.name}</Link>
+    ),
+  },
+  { accessorKey: "email", header: "Email" },
+];
 
   return (
     <div>
