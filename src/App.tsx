@@ -1,11 +1,16 @@
+// Importiamo il componente principale della homepage
+import Home from "./pages/Home";
+
+
 // Importiamo il componente principale della pagina dei post.
 import PostsList from "./pages/PostsList";
 
 // Importiamo anche il componente della pagina utenti 
 import UsersList from "./pages/UsersList";
 
+
 //importazione Router
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 
 
@@ -15,10 +20,13 @@ import { BrowserRouter } from "react-router-dom";
 function App() {
   return (
 
-      <BrowserRouter>
-        <PostsList />
-        <UsersList />
-      </BrowserRouter>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/posts" element={<PostsList />} />
+        <Route path="/users" element={<UsersList />} />
+      </Routes>
+    </BrowserRouter>
 
   );
 }
