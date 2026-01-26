@@ -1,7 +1,19 @@
+//import React e gli hook necessari
 import { useEffect, useState } from "react";
+
+//import Material React Table
+import { MaterialReactTable } from "material-react-table";
+
+// Import della funzione che recupera i post dal backend
 import { getPosts } from "../api/posts.api";
+
+// Import del tipo Post
 import type { Post } from "../types/post";
-import { Link } from "react-router-dom"; 
+
+// Import del componente Link per la navigazione
+import { Link } from "react-router-dom";
+
+
 
 // Questo componente rappresenta la pagina che mostra la lista dei post
 export default function PostsList() {
@@ -35,22 +47,21 @@ export default function PostsList() {
     return <p>Caricamento...</p>;
   }
 
+  const columns = [
+    { accessorKey: "title", header: "Titolo" },
+    { accessorKey: "userId", header: "User ID" },
+    {
+      header: "Dettagli",
+      Cell: ({ row }: any) => <Link to={`/posts/${row.original.id}`}>Apri</Link>,
+    },
+  ];
+
+
   // Quando i dati sono disponibili, renderizziamo la lista
   return (
     <div>
       <h1>Lista Post</h1>
-
-      <ul>
-        {posts.map((post) => (
-          <li key={post.id}>
-            <strong>{post.title}</strong>
-            <br />
-            <small>User ID: {post.userId}</small>
-            <br />
-            <Link to={`/posts/${post.id}`}>Dettagli</Link>
-          </li>
-        ))}
-      </ul>
+      <MaterialReactTable columns={columns} data={posts} />
     </div>
   );
 }
