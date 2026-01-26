@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getUsers } from "../api/users.api";
 import type { User } from "../types/user";
+import { Link } from "react-router-dom";
+
 
 
 export default function UsersList() {
@@ -27,11 +29,9 @@ export default function UsersList() {
 
       <ul>
         {users.map((user) => (
-          <li key={user.id}>
+          <Link to={`/users/${user.id}`}>
             <strong>{user.name}</strong>
-            <br />
-            <small>{user.email}</small>
-          </li>
+          </Link>
         ))}
       </ul>
     </div>
