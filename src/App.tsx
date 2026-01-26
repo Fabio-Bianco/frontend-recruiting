@@ -16,7 +16,7 @@ import Navbar from "./components/Navbar";
 // Import del componente della pagina di dettaglio del post
 import PostsDetails from "./pages/details/PostsDetails";
 
-import { UserDetail } from "./pages/details/UserDeatil";
+import UserDetail from "./pages/details/UserDetail";
 
 
 

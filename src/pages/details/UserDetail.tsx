@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 import { getUserById } from "../../api/users.api";
 import type { User } from "../../types/user";
 
-export function UserDetail() {
+
+export default function UserDetail() {
   const { id } = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,10 +21,20 @@ export function UserDetail() {
         const data = await getUserById(id);
         setUser(data);
       } catch (err) {
+
         const status = (err as any)?.response?.status;
-        setError(status === 404 ? "Utente non trovato." : "Errore nel caricamento dell'utente.");
+        if (status === 404) {
+
+          setError("Utente non trovato.");
+
+        } else {
+
+          setError("Errore nel caricamento dell'utente.");
+        }
         setUser(null);
+
       } finally {
+
         setLoading(false);
       }
     }
@@ -31,13 +42,15 @@ export function UserDetail() {
     loadUser();
   }, [id]);
 
-  if (loading) return <div>Caricamento in corso...</div>;
-  if (error) return <div>{error}</div>;
-  if (!user) return <div>Utente non trovato.</div>;
+  if (loading) return <p>Caricamento...</p>;
+  if (error) return <p>{error}</p>;
+  if (!user) return <p>Utente non trovato.</p>;
 
   return (
     <div>
-      <h1>{user.name}</h1>
+      <h1>Pagina di dettaglio dell'utente</h1>
+      <p>ID dell'utente: {id}</p>
+      <p>Nome: {user.name}</p>
       <p>Email: {user.email}</p>
     </div>
   );
