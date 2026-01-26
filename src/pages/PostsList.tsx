@@ -13,16 +13,42 @@ import type { Post } from "../types/post";
 // Import del componente Link per la navigazione
 import { Link } from "react-router-dom";
 
+// Import dei tipi di Material React Table
+import type { MRT_ColumnDef } from "material-react-table";
+
+import type {
+  MRT_ColumnFilterFnsState,
+  MRT_PaginationState,
+  MRT_SortingState,
+} from "material-react-table";
+
 
 
 // Questo componente rappresenta la pagina che mostra la lista dei post
 export default function PostsList() {
 
+  // -----------------------------
+  // 1) DATA (i post dal backend)
+  // -----------------------------
+
   // Stato che contiene i post ricevuti dal backend
   const [posts, setPosts] = useState<Post[]>([]);
-
-  // Stato che indica se stiamo ancora caricando i dati
+  // Stato per il caricamento
   const [loading, setLoading] = useState(true);
+
+
+  // -----------------------------
+  // 2) TABLE STATE (stato tabella)
+  // -----------------------------
+
+
+
+
+
+
+  // -----------------------------
+  // 3) LOAD DATA (fetch posts)
+  // -----------------------------
 
   // useEffect viene eseguito una sola volta quando il componente viene montato
   useEffect(() => {
@@ -48,15 +74,17 @@ export default function PostsList() {
   }
 
   // Definizione delle colonne per Material React Table
-  const columns = [
+  //MRT_ColumnDef<Post> tipizza columns come la colonna dei post
+  const columns: MRT_ColumnDef<Post>[] = [
     { accessorKey: "title", header: "Titolo" },
     { accessorKey: "userId", header: "User ID" },
     {
       header: "Dettagli",
-      Cell: ({ row }: any) => <Link to={`/posts/${row.original.id}`}>Dettagli</Link>,
+      Cell: ({ row }) => <Link to={`/posts/${row.original.id}`}>Dettagli</Link>,
     },
   ];
 
+  //row.original.id accede all'id del post originale
 
   // Quando i dati sono disponibili, renderizziamo la lista
   return (

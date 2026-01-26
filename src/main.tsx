@@ -17,13 +17,9 @@ import App from './App.tsx'
 
 // Creazione del root e rendering dell’app all’interno dell’elemento con id 'root'
 createRoot(document.getElementById('root')!).render(
-//Modalità stretta di React per evidenziare potenziali problemi
-  <StrictMode> 
-
-    // Reset dello stile di base di Material UI
-    <CssBaseline /> 
-
-    // Contenitore principale dell’app con larghezza massima 'lg' e padding verticale
+  
+  <StrictMode>
+    <CssBaseline />
     <Container maxWidth="lg" sx={{ py: 3 }}>
       <App />
     </Container>

@@ -9,11 +9,28 @@ import type { User } from "../types/user";
 // Import del componente Link per la navigazione
 import { Link } from "react-router-dom";
 
+// Import dei tipi di Material React Table
+import type { MRT_ColumnDef } from "material-react-table";
+
 
 // Questo componente rappresenta la pagina che mostra la lista degli utenti
 export default function UsersList() {
+
+  // -----------------------------
+  // 1) DATA (i post dal backend)
+  // -----------------------------
+
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+
+
+  // -----------------------------
+  // 2) TABLE STATE (stato tabella)
+  // -----------------------------
+
+  // -----------------------------
+  // 3) LOAD DATA (fetch posts)
+  // -----------------------------
 
   // useEffect viene eseguito una sola volta quando il componente viene montato
   useEffect(() => {
@@ -31,22 +48,20 @@ export default function UsersList() {
   }
 
   // Definizione delle colonne per Material React Table
-const columns = [
-  {
-    accessorKey: "name",
-    header: "Nome",
-    Cell: ({ row }: any) => (
-      <Link to={`/users/${row.original.id}`}>{row.original.name}</Link>
-    ),
-  },
-  { accessorKey: "email", header: "Email" },
-];
+  const columns: MRT_ColumnDef<User>[] = [
+    {
+      accessorKey: "name",
+      header: "Nome",
+      Cell: ({ row }) => (
+        <Link to={`/users/${row.original.id}`}>{row.original.name}</Link>
+      ),
+    },
+    { accessorKey: "email", header: "Email" },
+  ];
 
   return (
     <div>
       <h1>Lista Utenti</h1>
-
-
       <MaterialReactTable columns={columns} data={users} />
     </div>
   );

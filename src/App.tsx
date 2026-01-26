@@ -29,12 +29,12 @@ function App() {
     // Configurazione del Router per la navigazione tra le pagine
     <BrowserRouter>
 
-    // Barra di navigazione principale
+
       <Navbar />
 
-  // Definizione delle rotte dell’app
+
       <Routes>
-  // Rotta singola per ogni pagina
+
         <Route path="/" element={<Home />} />
 
         <Route path="/posts" element={<PostsList />} />
