@@ -1,16 +1,11 @@
 // src/pages/UsersList.tsx
-/**
- * =========================================================
- * IMPORTAZIONI
- * =========================================================
- */
-
 import { useEffect, useMemo, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
 import { readFromSessionStorage, writeToSessionStorage } from "../utils/storage";
 import { MaterialReactTable } from "material-react-table";
 import { getUsers } from "../api/users.api";
+import UsersDrawer from "../components/users/UsersDrawer";
 import type { User } from "../types/user";
 import type { 
   MRT_ColumnDef, 
@@ -19,22 +14,17 @@ import type {
   MRT_ColumnFiltersState 
 } from "material-react-table";
 
-
-// Questo componente rappresenta la pagina che mostra la lista degli utenti
 export default function UsersList() {
-
-  // -----------------------------
-  // 1) DATA (gli utenti dal backend)
-  // -----------------------------
-
+  /**
+   * STATE DATI
+   */
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-
-  // -----------------------------
-  // 2) TABLE STATE (stato tabella)
-  // -----------------------------
+  /**
+   * STATE UI DELLA TABELLA CON PERSISTENZA
+   */
   type UsersTableStatePersisted = {
     pagination: MRT_PaginationState;
     sorting: MRT_SortingState;
@@ -60,11 +50,22 @@ export default function UsersList() {
     saved?.globalFilter ?? ""
   );
 
-  // -----------------------------
-  // 3) LOAD DATA (fetch users)
-  // -----------------------------
+  /**
+   * SALVATAGGIO AUTOMATICO STATO TABELLA
+   */
+  useEffect(() => {
+    const payload: UsersTableStatePersisted = {
+      pagination,
+      sorting,
+      columnFilters,
+      globalFilter,
+    };
+    writeToSessionStorage(USERS_TABLE_STORAGE_KEY, payload);
+  }, [pagination, sorting, columnFilters, globalFilter]);
 
-  // Funzione per caricare gli utenti
+  /**
+   * FETCH USERS
+   */
   async function fetchUsers() {
     setLoading(true);
     setErrorMsg(null);
@@ -79,27 +80,41 @@ export default function UsersList() {
     }
   }
 
-  // useEffect per il caricamento iniziale
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  // useEffect per salvare lo stato della tabella
-  useEffect(() => {
-    const payload: UsersTableStatePersisted = {
-      pagination,
-      sorting,
-      columnFilters,
-      globalFilter,
-    };
-    writeToSessionStorage(USERS_TABLE_STORAGE_KEY, payload);
-  }, [pagination, sorting, columnFilters, globalFilter]);
+  /**
+   * STATE DRAWER
+   */
+  type DrawerMode = "create" | "edit";
 
-  // -----------------------------
-  // 4) RENDERING
-  // -----------------------------
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<DrawerMode>("create");
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  // Definizione delle colonne per Material React Table
+  /**
+   * FUNZIONI DRAWER
+   */
+  function openCreateDrawer() {
+    setDrawerMode("create");
+    setSelectedUser(null);
+    setDrawerOpen(true);
+  }
+
+  function openEditorDrawer(user: User) {
+    setDrawerMode("edit");
+    setSelectedUser(user);
+    setDrawerOpen(true);
+  }
+
+  function closeDrawer() {
+    setDrawerOpen(false);
+  }
+
+  /**
+   * DEFINIZIONE COLONNE
+   */
   const columns = useMemo<MRT_ColumnDef<User>[]>(
     () => [
       {
@@ -118,22 +133,35 @@ export default function UsersList() {
       {
         header: "Azioni",
         id: "actions",
-        size: 120,
+        size: 220,
         Cell: ({ row }) => (
-          <Button
-            component={RouterLink}
-            to={`/users/${row.original.id}`}
-            variant="outlined"
-            size="small"
-          >
-            Dettagli
-          </Button>
+          <Stack direction="row" spacing={1}>
+            <Button
+              component={RouterLink}
+              to={`/users/${row.original.id}`}
+              variant="outlined"
+              size="small"
+            >
+              Apri
+            </Button>
+
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => openEditorDrawer(row.original)}
+            >
+              Modifica
+            </Button>
+          </Stack>
         ),
       },
     ],
     []
   );
 
+  /**
+   * RENDER
+   */
   if (loading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
@@ -152,6 +180,7 @@ export default function UsersList() {
 
   return (
     <Box>
+      {/* Header pagina */}
       <Stack
         direction="row"
         alignItems="center"
@@ -159,8 +188,13 @@ export default function UsersList() {
         sx={{ mb: 2 }}
       >
         <Typography variant="h4">Utenti</Typography>
+
+        <Button variant="contained" onClick={openCreateDrawer}>
+          Nuovo Utente
+        </Button>
       </Stack>
 
+      {/* Material React Table */}
       <MaterialReactTable
         columns={columns}
         data={users}
@@ -175,6 +209,18 @@ export default function UsersList() {
         onSortingChange={setSorting}
         onColumnFiltersChange={setColumnFilters}
         onGlobalFilterChange={setGlobalFilter}
+      />
+
+      {/* Users Drawer per CRUD */}
+      <UsersDrawer
+        open={drawerOpen}
+        mode={drawerMode}
+        onClose={closeDrawer}
+        initialUser={selectedUser}
+        onSaved={() => {
+          closeDrawer();
+          fetchUsers();
+        }}
       />
     </Box>
   );
