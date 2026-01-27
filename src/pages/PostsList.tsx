@@ -192,26 +192,34 @@ export default function PostsList() {
         accessorKey: "createdAt",
         // Esempio: se vuoi formattare in futuro, qui puoi usare Cell()
       },
+
+      
       {
-        /**
-         * Colonna "Dettagli"
-         * - non ha accessorKey perché non legge un campo diretto
-         * - usa row.original (che è Post, grazie alla tipizzazione)
-         */
-        header: "Dettagli",
-        id: "details", // id esplicito, così MRT non deve inventarlo
-        size: 120,
-        Cell: ({ row }) => (
-          <Button
-            component={RouterLink}
-            to={`/posts/${row.original.id}`}
-            variant="outlined"
-            size="small"
-          >
-            Apri
-          </Button>
-        ),
-      },
+  header: "Azioni",
+  id: "actions",
+  size: 220,
+  Cell: ({ row }) => (
+    <Stack direction="row" spacing={1}>
+      <Button
+        component={RouterLink}
+        to={`/posts/${row.original.id}`}
+        variant="outlined"
+        size="small"
+      >
+        Apri
+      </Button>
+
+      <Button
+        variant="contained"
+        size="small"
+        onClick={() => openEditorDrawer(row.original)}
+      >
+        Modifica
+      </Button>
+    </Stack>
+  ),
+},
+
     ],
     []
   );
