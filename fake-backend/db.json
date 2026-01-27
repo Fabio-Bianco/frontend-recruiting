@@ -1,12 +1,6 @@
 {
   "users": [
     {
-      "name": "Mario Rossi",
-      "email": "mario@example.com",
-      "password": "password123",
-      "id": "1"
-    },
-    {
       "id": "2",
       "name": "Luigi Bianchi",
       "email": "luigi@example.com",
