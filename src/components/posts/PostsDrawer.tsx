@@ -10,7 +10,7 @@ interface PostsDrawerProps {
   onClose: () => void;
   onSaved: (post?: Post) => void;
 }
-
+// Componente Drawer per creare/modificare un Post
 export default function PostsDrawer({
     open,
     mode,
@@ -18,6 +18,8 @@ export default function PostsDrawer({
     onClose,
     onSaved,
 }: PostsDrawerProps) {
+
+    
 
 
     const title = mode === "create" ? "Nuovo Post" : "Modifica Post"; 

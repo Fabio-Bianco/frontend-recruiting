@@ -24,3 +24,9 @@ export async function getPostById(id: string): Promise<Post> {
 export async function deletePost(id: string): Promise<void> {
   await apiClient.delete(`/posts/${id}`);
 };
+
+// Funzione che crea un nuovo post
+export async function createPost(){};
+
+// Funzione che aggiorna un post esistente
+export async function updatePost(){};
