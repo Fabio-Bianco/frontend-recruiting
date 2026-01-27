@@ -1,28 +1,20 @@
 // src/pages/PostsList.tsx
+/**
+ * =========================================================
+ * IMPORTAZIONI
+ * =========================================================
+ */
+
 import { useEffect, useMemo, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import PostsDrawer from "../components/posts/PostsDrawer";
-// MUI
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Button, CircularProgress, Stack, Typography,} from "@mui/material";
 
-// Material React Table
-import { MaterialReactTable } from "material-react-table";
-import type {
-  MRT_ColumnDef,
-  MRT_PaginationState,
-  MRT_SortingState,
-  MRT_ColumnFiltersState,
-} from "material-react-table";
-import type { Post } from "../types/post";
 import { getPosts } from "../api/posts.api";
+import PostsDrawer from "../components/posts/PostsDrawer";
+import { MaterialReactTable } from "material-react-table";
 import { readFromSessionStorage, writeToSessionStorage } from "../utils/storage";
-
+import type { MRT_ColumnDef, MRT_PaginationState, MRT_SortingState, MRT_ColumnFiltersState,} from "material-react-table";
+import type { Post } from "../types/post";
 
 
 /**
@@ -55,6 +47,7 @@ export default function PostsList() {
    * Persistenza di: pagination, sorting, columnFilters, globalFilter
    */
   // Tipo per lo stato persistente della tabella
+
   type PostsTableStatePersisted = {
     pagination: MRT_PaginationState;
     sorting: MRT_SortingState;
@@ -87,6 +80,7 @@ export default function PostsList() {
    * =========================================================
    * Ogni volta che cambia lo stato, salviamo tutto automaticamente.
    */
+
   useEffect(() => {
     const payload: PostsTableStatePersisted = {
       pagination,
@@ -96,6 +90,8 @@ export default function PostsList() {
     };
     writeToSessionStorage(POSTS_TABLE_STORAGE_KEY, payload);
   }, [pagination, sorting, columnFilters, globalFilter]);
+
+
 
   /**
    * =========================================================
@@ -132,14 +128,14 @@ export default function PostsList() {
   //  FUNZIONI DRAWER
 
   // Apri drawer in modalità "create"
-  function openCreateDrawer(){
+  function openCreateDrawer() {
     setDrawerMode("create");
     setSelectedPost(null);
     setDrawerOpen(true);
   }
 
   // Apri drawer in modalità "edit"
-  function openEditorDrawer(post: Post){
+  function openEditorDrawer(post: Post) {
 
     setDrawerMode("edit");
     setSelectedPost(post);
@@ -147,9 +143,9 @@ export default function PostsList() {
   }
 
   // Chiudi drawer
-  function closeDrawer(){
+  function closeDrawer() {
     setDrawerOpen(false);
-    
+
   }
 
   /**
@@ -161,6 +157,8 @@ export default function PostsList() {
    * Importante: MRT_ColumnDef<Post>[] garantisce che accessorKey sia
    * compatibile con i campi di Post (riduce bug e typo).
    */
+
+  // Definizione colonne
   const columns = useMemo<MRT_ColumnDef<Post>[]>(
     () => [
       {
@@ -182,34 +180,31 @@ export default function PostsList() {
         accessorKey: "createdAt",
         // Esempio: se vuoi formattare in futuro, qui puoi usare Cell()
       },
-
-      
       {
-  header: "Azioni",
-  id: "actions",
-  size: 220,
-  Cell: ({ row }) => (
-    <Stack direction="row" spacing={1}>
-      <Button
-        component={RouterLink}
-        to={`/posts/${row.original.id}`}
-        variant="outlined"
-        size="small"
-      >
-        Apri
-      </Button>
+        header: "Azioni",
+        id: "actions",
+        size: 220,
+        Cell: ({ row }) => (
+          <Stack direction="row" spacing={1}>
+            <Button
+              component={RouterLink}
+              to={`/posts/${row.original.id}`}
+              variant="outlined"
+              size="small"
+            >
+              Apri
+            </Button>
 
-      <Button
-        variant="contained"
-        size="small"
-        onClick={() => openEditorDrawer(row.original)}
-      >
-        Modifica
-      </Button>
-    </Stack>
-  ),
-},
-
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => openEditorDrawer(row.original)}
+            >
+              Modifica
+            </Button>
+          </Stack>
+        ),
+      },
     ],
     []
   );
@@ -246,7 +241,6 @@ export default function PostsList() {
       >
         <Typography variant="h4">Posts</Typography>
 
-        {/* Questo bottone oggi non fa nulla: lo userai per il Drawer CRUD */}
         <Button variant="contained" onClick={openCreateDrawer}>
           Nuovo Post
         </Button>
@@ -269,17 +263,17 @@ export default function PostsList() {
         onGlobalFilterChange={setGlobalFilter}
       />
 
-      {/* Posts Drawer for CRUD operations */}
-<PostsDrawer 
-  open={drawerOpen}
-  mode={drawerMode}
-  onClose={closeDrawer}
-  initialPost={selectedPost}
-  onSaved={() => {
-    closeDrawer();
-    fetchPosts();
-  }}
-/>
+      {/* Posts Drawer per CRUD */}
+      <PostsDrawer
+        open={drawerOpen}
+        mode={drawerMode}
+        onClose={closeDrawer}
+        initialPost={selectedPost}
+        onSaved={() => {
+          closeDrawer();
+          fetchPosts();
+        }}
+      />
 
     </Box>
   );

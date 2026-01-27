@@ -13,6 +13,27 @@ export async function getUserById(id: string): Promise<User> {
   return data;
 }
 
+// Funzione che crea un nuovo utente
+export async function createUser(userPayload: Omit<User, "id">): Promise<User> {
+  const response = await apiClient.post<User>("/users", userPayload);
+  return response.data;
+};
+
+// Funzione che aggiorna un utente esistente  
+export async function updateUser(id: string, userPayload: Omit<User, "id">): Promise<User> {
+  const response = await apiClient.put<User>(`/users/${id}`, userPayload);
+  return response.data;
+};
+
+// Funzione che elimina un utente dato il suo ID
+export async function deleteUser(id: string): Promise<void> {
+  await apiClient.delete<void>(`/users/${id}`);
+};
+
+
+
+
+// Funzione per il login dell'utente
 export async function loginUser(email: string, password: string): Promise<User | null> {
   try {
     // Chiama GET /users?email=xxx&password=yyy per verificare le credenziali
