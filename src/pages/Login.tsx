@@ -25,24 +25,20 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setErrorMsg(null);
-    setSubmitting(true);
+async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault();
+  setSubmitting(true);
 
-    try {
-      const ok = await login(email, password);
-      if (!ok) {
-        setErrorMsg("Credenziali non valide.");
-        return;
-      }
-      navigate(from, { replace: true });
-    } catch {
-      setErrorMsg("Errore durante il login.");
-    } finally {
-      setSubmitting(false);
-    }
+  const ok = await login(email, password);
+
+  if (!ok) {
+    setErrorMsg("Credenziali non valide.");
+    setSubmitting(false);
+    return;
   }
+
+  navigate(from, { replace: true });
+}
 
   return (
     <Box sx={{ maxWidth: 420, mx: "auto", mt: 8 }}>

@@ -15,3 +15,12 @@ export async function getPostById(id: string): Promise<Post> {
   const { data } = await apiClient.get<Post>(`/posts/${id}`);
   return data;
 }
+
+
+// Funzione che cancella un post dato il suo ID
+// Nota: id è string perché lo passiamo direttamente da useParams.
+// JSON-server accetta comunque /posts/1 come URL string.
+
+export async function deletePost(id: string): Promise<void> {
+  await apiClient.delete(`/posts/${id}`);
+};

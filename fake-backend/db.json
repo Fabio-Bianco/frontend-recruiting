@@ -1,121 +1,121 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Mario Rossi",
       "email": "mario@example.com",
       "password": "password123"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Luigi Bianchi",
       "email": "luigi@example.com",
       "password": "password456"
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Giulia Verdi",
       "email": "giulia@example.com",
       "password": "password789"
     },
     {
-      "id": 4,
+      "id": "4",
       "name": "Marco Ferrari",
       "email": "marco@example.com",
       "password": "password101"
     },
     {
-      "id": 5,
+      "id": "5",
       "name": "Anna Romano",
       "email": "anna@example.com",
       "password": "password202"
     },
     {
-      "id": 6,
+      "id": "6",
       "name": "Francesco Conti",
       "email": "francesco@example.com",
       "password": "password303"
     },
     {
-      "id": 7,
+      "id": "7",
       "name": "Sara Moretti",
       "email": "sara@example.com",
       "password": "password404"
     },
     {
-      "id": 8,
+      "id": "8",
       "name": "Alessandro Ricci",
       "email": "alessandro@example.com",
       "password": "password505"
     },
     {
-      "id": 9,
+      "id": "9",
       "name": "Chiara Fontana",
       "email": "chiara@example.com",
       "password": "password606"
     },
     {
-      "id": 10,
+      "id": "10",
       "name": "Davide Martini",
       "email": "davide@example.com",
       "password": "password707"
     },
     {
-      "id": 11,
+      "id": "11",
       "name": "Elena Barbieri",
       "email": "elena@example.com",
       "password": "password808"
     },
     {
-      "id": 12,
+      "id": "12",
       "name": "Luca Galli",
       "email": "luca@example.com",
       "password": "password909"
     },
     {
-      "id": 13,
+      "id": "13",
       "name": "Federica Marino",
       "email": "federica@example.com",
       "password": "password010"
     },
     {
-      "id": 14,
+      "id": "14",
       "name": "Simone Costa",
       "email": "simone@example.com",
       "password": "password111"
     },
     {
-      "id": 15,
+      "id": "15",
       "name": "Valentina Greco",
       "email": "valentina@example.com",
       "password": "password222"
     },
     {
-      "id": 16,
+      "id": "16",
       "name": "Roberto Villa",
       "email": "roberto@example.com",
       "password": "password333"
     },
     {
-      "id": 17,
+      "id": "17",
       "name": "Francesca Lombardi",
       "email": "francesca@example.com",
       "password": "password444"
     },
     {
-      "id": 18,
+      "id": "18",
       "name": "Matteo Rizzo",
       "email": "matteo@example.com",
       "password": "password555"
     },
     {
-      "id": 19,
+      "id": "19",
       "name": "Giorgia Mancini",
       "email": "giorgia@example.com",
       "password": "password666"
     },
     {
-      "id": 20,
+      "id": "20",
       "name": "Andrea Pellegrini",
       "email": "andrea@example.com",
       "password": "password777"
@@ -123,140 +123,126 @@
   ],
   "posts": [
     {
-      "id": 1,
-      "userId": 1,
-      "title": "Il mio primo post",
-      "content": "Contenuto di esempio",
-      "createdAt": "2025-01-10T10:30:00Z"
-    },
-    {
-      "id": 2,
-      "userId": 2,
-      "title": "Introduzione a React",
-      "content": "React è una libreria JavaScript per costruire interfacce utente",
-      "createdAt": "2025-01-15T14:20:00Z"
-    },
-    {
-      "id": 3,
+      "id": "3",
       "userId": 3,
       "title": "TypeScript per principianti",
       "content": "TypeScript aggiunge tipizzazione statica a JavaScript",
       "createdAt": "2025-01-18T09:45:00Z"
     },
     {
-      "id": 4,
+      "id": "4",
       "userId": 4,
       "title": "Guida a Vite",
       "content": "Vite è un build tool veloce e moderno per progetti web",
       "createdAt": "2025-01-20T16:30:00Z"
     },
     {
-      "id": 5,
+      "id": "5",
       "userId": 5,
       "title": "Best practices CSS",
       "content": "Consigli per scrivere CSS mantenibile e scalabile",
       "createdAt": "2025-01-22T11:00:00Z"
     },
     {
-      "id": 6,
+      "id": "6",
       "userId": 6,
       "title": "Node.js Fundamentals",
       "content": "Imparare le basi di Node.js per lo sviluppo backend",
       "createdAt": "2025-01-23T08:15:00Z"
     },
     {
-      "id": 7,
+      "id": "7",
       "userId": 7,
       "title": "Material-UI Tutorial",
       "content": "Come utilizzare Material-UI per creare belle interfacce React",
       "createdAt": "2025-01-24T13:45:00Z"
     },
     {
-      "id": 8,
+      "id": "8",
       "userId": 8,
       "title": "Git e GitHub",
       "content": "Guida completa per gestire il codice con Git e GitHub",
       "createdAt": "2025-01-25T15:20:00Z"
     },
     {
-      "id": 9,
+      "id": "9",
       "userId": 9,
       "title": "Express.js per API REST",
       "content": "Creare API REST robuste con Express.js",
       "createdAt": "2025-01-26T09:30:00Z"
     },
     {
-      "id": 10,
+      "id": "10",
       "userId": 10,
       "title": "MongoDB Basics",
       "content": "Introduzione ai database NoSQL con MongoDB",
       "createdAt": "2025-01-27T12:10:00Z"
     },
     {
-      "id": 11,
+      "id": "11",
       "userId": 11,
       "title": "React Router v6",
       "content": "Navigazione client-side con React Router versione 6",
       "createdAt": "2025-01-28T14:25:00Z"
     },
     {
-      "id": 12,
+      "id": "12",
       "userId": 12,
       "title": "Async/Await in JavaScript",
       "content": "Gestire operazioni asincrone con async e await",
       "createdAt": "2025-01-29T10:40:00Z"
     },
     {
-      "id": 13,
+      "id": "13",
       "userId": 13,
       "title": "Testing con Jest",
       "content": "Scrivere test unitari efficaci con Jest",
       "createdAt": "2025-01-30T16:55:00Z"
     },
     {
-      "id": 14,
+      "id": "14",
       "userId": 14,
       "title": "Docker per sviluppatori",
       "content": "Containerizzare applicazioni con Docker",
       "createdAt": "2025-01-31T11:35:00Z"
     },
     {
-      "id": 15,
+      "id": "15",
       "userId": 15,
       "title": "Webpack Configuration",
       "content": "Configurare Webpack per progetti moderni",
       "createdAt": "2025-02-01T13:20:00Z"
     },
     {
-      "id": 16,
+      "id": "16",
       "userId": 16,
       "title": "Redux Toolkit",
       "content": "Gestione dello stato globale con Redux Toolkit",
       "createdAt": "2025-02-02T09:15:00Z"
     },
     {
-      "id": 17,
+      "id": "17",
       "userId": 17,
       "title": "PWA Development",
       "content": "Creare Progressive Web Apps moderne",
       "createdAt": "2025-02-03T15:45:00Z"
     },
     {
-      "id": 18,
+      "id": "18",
       "userId": 18,
       "title": "GraphQL vs REST",
       "content": "Confronto tra GraphQL e API REST tradizionali",
       "createdAt": "2025-02-04T12:30:00Z"
     },
     {
-      "id": 19,
+      "id": "19",
       "userId": 19,
       "title": "CSS Grid Layout",
       "content": "Creare layout complessi con CSS Grid",
       "createdAt": "2025-02-05T14:50:00Z"
     },
     {
-      "id": 20,
+      "id": "20",
       "userId": 20,
       "title": "Vue.js vs React",
       "content": "Confronto tra i due framework JavaScript più popolari",

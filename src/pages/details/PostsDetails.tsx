@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { getPostById } from "../../api/posts.api";
+import { useParams, useNavigate } from "react-router-dom";
+import { getPostById, deletePost } from "../../api/posts.api";
+import { Box, Button, Stack, Typography } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import DeleteIcon from "@mui/icons-material/Delete";
 import type { Post } from "../../types/post";
 
 
 export default function PostsDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [deleting, setDeleting] = useState(false);
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,17 +47,70 @@ export default function PostsDetails() {
     loadPost();
   }, [id]);
 
-  if (loading) return <p>Caricamento...</p>;
-  if (error) return <p>{error}</p>;
-  if (!post) return <p>Post non trovato.</p>;
+
+  //funzione di cancellazione post
+
+  async function handleDelete() {
+
+    if (!id) return;
+
+    const confirmed = window.confirm("Sei sicuro di voler cancellare questo post?");
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+      await deletePost(id);
+      navigate("/posts", { replace: true });
+    }catch {
+      setError("Errore nella cancellazione del post.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+if (loading) return <Typography>Caricamento...</Typography>;
+if (error) return <Typography color="error">{error}</Typography>;
+if (!post) return <Typography color="error">Post non trovato.</Typography>;
+
 
   return (
-    <div>
-      <h1>Pagina di dettaglio del post</h1>
-      <p>ID del post: {id}</p>
-      <p>Titolo: {post.title}</p>
-      <p>Contenuto: {post.content}</p>
-      <small>Creato il: {post.createdAt}</small>
-    </div>
+    
+     <Box> 
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Dettaglio Post
+      </Typography>
+
+      
+    <Box sx={{ mb: 2 }}>
+
+      <Typography variant="h6">Titolo: {post.title}</Typography>
+      <Typography variant="body1" sx={{ mt: 1, mb: 2 }}>Contenuto: {post.content}</Typography>
+      <Typography variant="body2" color="textSecondary">
+        Creato il: {post.createdAt}
+      </Typography>
+    </Box>
+
+    <Stack direction="row" spacing={2}>
+      <Button
+        variant="outlined"
+        startIcon={<ArrowBackIcon />}
+        onClick={() => navigate("/posts")}
+      >
+        Indietro
+      </Button>
+
+      <Button
+        variant="contained"
+        color="error"
+        startIcon={<DeleteIcon />}
+        onClick={handleDelete}
+        disabled={deleting}
+      >
+        {deleting ? "Cancellazione..." : "Cancella Post"}
+      </Button>
+    </Stack>
+
+
+     </Box>
   );
 }

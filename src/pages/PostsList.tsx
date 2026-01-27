@@ -128,7 +128,7 @@ export default function PostsList() {
 
   /**
    * =========================================================
-   * DEFINIZIONE COLONNE (TIPIZZATE!)
+   * DEFINIZIONE COLONNE (TIPIZZATE!) TIPIZZAZIONE COLONNE
    * =========================================================
    * useMemo evita di ricreare le colonne ad ogni render.
    * Non è obbligatorio, ma è buona pratica e aiuta performance / stabilità.
