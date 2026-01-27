@@ -1,7 +1,7 @@
 // src/pages/PostsList.tsx
 import { useEffect, useMemo, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-
+import PostsDrawer from "../components/posts/PostsDrawer";
 // MUI
 import {
   Box,
@@ -19,25 +19,22 @@ import type {
   MRT_SortingState,
   MRT_ColumnFiltersState,
 } from "material-react-table";
-
-// ✅ I tuoi tipi (adatta il path)
 import type { Post } from "../types/post";
-
-// ✅ Le tue API (adatta il path + nome funzione)
 import { getPosts } from "../api/posts.api";
-
-// ✅ Storage utilities
 import { readFromSessionStorage, writeToSessionStorage } from "../utils/storage";
 
-// Tipo per lo stato persistente della tabella
-type PostsTableStatePersisted = {
-  pagination: MRT_PaginationState;
-  sorting: MRT_SortingState;
-  columnFilters: MRT_ColumnFiltersState;
-  globalFilter: string;
-};
 
-const POSTS_TABLE_STORAGE_KEY = "postsTableState.v1";
+
+/**
+ * =========================================================
+ * FUNZIONE PRINCIPALE PostsList
+ * =========================================================
+ * Pagina che mostra la lista dei posts in una tabella con
+ * Material React Table, con stato della tabella persistente in
+ * sessionStorage.
+ * Gestisce anche fetch dei posts e stato del drawer CRUD.
+ * =========================================================
+ */
 
 export default function PostsList() {
   /**
@@ -46,9 +43,10 @@ export default function PostsList() {
    * =========================================================
    * Questi sono i dati veri (posts) che arrivano dal backend fake.
    */
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [post, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
 
   /**
    * =========================================================
@@ -56,22 +54,29 @@ export default function PostsList() {
    * =========================================================
    * Persistenza di: pagination, sorting, columnFilters, globalFilter
    */
+  // Tipo per lo stato persistente della tabella
+  type PostsTableStatePersisted = {
+    pagination: MRT_PaginationState;
+    sorting: MRT_SortingState;
+    columnFilters: MRT_ColumnFiltersState;
+    globalFilter: string;
+  };
+
+  const POSTS_TABLE_STORAGE_KEY = "postsTableState.v1";
+
+
   const saved = readFromSessionStorage<PostsTableStatePersisted>(
     POSTS_TABLE_STORAGE_KEY
   );
-
   const [pagination, setPagination] = useState<MRT_PaginationState>(
     saved?.pagination ?? { pageIndex: 0, pageSize: 10 }
   );
-
   const [sorting, setSorting] = useState<MRT_SortingState>(
     saved?.sorting ?? []
   );
-
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
     saved?.columnFilters ?? []
   );
-
   const [globalFilter, setGlobalFilter] = useState<string>(
     saved?.globalFilter ?? ""
   );
@@ -126,6 +131,36 @@ export default function PostsList() {
     };
   }, []);
 
+  //  STATE DRAWER
+  type DrawerMode = "create" | "edit";
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<DrawerMode>("create");
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+
+  //  FUNZIONI DRAWER
+
+  // Apri drawer in modalità "create"
+  function openCreateDrawer(){
+    setDrawerMode("create");
+    setSelectedPost(null);
+    setDrawerOpen(true);
+  }
+
+  // Apri drawer in modalità "edit"
+  function openEditorDrawer(post: Post){
+
+    setDrawerMode("edit");
+    setSelectedPost(post);
+    setDrawerOpen(true);
+  }
+
+  // Chiudi drawer
+  function closeDrawer(){
+    setDrawerOpen(false);
+    
+  }
+
   /**
    * =========================================================
    * DEFINIZIONE COLONNE (TIPIZZATE!) TIPIZZAZIONE COLONNE
@@ -136,7 +171,7 @@ export default function PostsList() {
    * Importante: MRT_ColumnDef<Post>[] garantisce che accessorKey sia
    * compatibile con i campi di Post (riduce bug e typo).
    */
-  const columns = useMemo <MRT_ColumnDef<Post>[]>(
+  const columns = useMemo<MRT_ColumnDef<Post>[]>(
     () => [
       {
         header: "ID",
@@ -178,7 +213,7 @@ export default function PostsList() {
         ),
       },
     ],
-  []
+    []
   );
 
   /**
@@ -214,7 +249,7 @@ export default function PostsList() {
         <Typography variant="h4">Posts</Typography>
 
         {/* Questo bottone oggi non fa nulla: lo userai per il Drawer CRUD */}
-        <Button variant="contained">
+        <Button variant="contained" onClick={openCreateDrawer}>
           Nuovo Post
         </Button>
       </Stack>
@@ -222,7 +257,7 @@ export default function PostsList() {
       {/* Material React Table con persistenza completa */}
       <MaterialReactTable
         columns={columns}
-        data={posts}
+        data={post}
         enableGlobalFilter
         state={{
           pagination,
@@ -236,7 +271,33 @@ export default function PostsList() {
         onGlobalFilterChange={setGlobalFilter}
       />
 
-      
+      {/* Posts Drawer for CRUD operations */}
+      <PostsDrawer 
+        open={drawerOpen}
+        mode={drawerMode}
+        onClose={closeDrawer}
+        initialPost={selectedPost}
+        onSaved={(post) => {
+          // Se non c'è un post, chiudi semplicemente il drawer
+          if (!post) {
+            closeDrawer();
+            return;
+          }
+          
+          // Refresh dei posts in lista (aggiungi o modifica)
+          setPosts(prevPosts => {
+            if (drawerMode === "create") {
+              return [...prevPosts, post];
+            } else {
+              return prevPosts
+                .filter(postItem => postItem.id !== post.id)
+                .concat(post);
+            }
+          });
+          closeDrawer();
+        }}
+      />
+
     </Box>
   );
 }
