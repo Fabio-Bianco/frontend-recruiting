@@ -43,7 +43,7 @@ export default function PostsList() {
    * =========================================================
    * Questi sono i dati veri (posts) che arrivano dal backend fake.
    */
-  const [post, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -104,31 +104,22 @@ export default function PostsList() {
    * Fetch semplice, dichiarativo.
    * In caso di errore settiamo errorMsg.
    */
-  useEffect(() => {
-    let isMounted = true; // micro-protezione (evita setState dopo un unmount)
+  async function fetchPosts() {
+    setLoading(true);
+    setErrorMsg(null);
 
-    async function fetchPosts() {
-      setLoading(true);
-      setErrorMsg(null);
-
-      try {
-        const data = await getPosts();
-        if (!isMounted) return;
-        setPosts(data);
-      } catch (err) {
-        if (!isMounted) return;
-        setErrorMsg("Errore nel caricamento dei posts.");
-      } finally {
-        if (!isMounted) return;
-        setLoading(false);
-      }
+    try {
+      const data = await getPosts();
+      setPosts(data);
+    } catch (err) {
+      setErrorMsg("Errore nel caricamento dei posts.");
+    } finally {
+      setLoading(false);
     }
+  }
 
+  useEffect(() => {
     fetchPosts();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   //  STATE DRAWER
@@ -162,7 +153,6 @@ export default function PostsList() {
   }
 
   /**
-   * =========================================================
    * DEFINIZIONE COLONNE (TIPIZZATE!) TIPIZZAZIONE COLONNE
    * =========================================================
    * useMemo evita di ricreare le colonne ad ogni render.
@@ -265,7 +255,7 @@ export default function PostsList() {
       {/* Material React Table con persistenza completa */}
       <MaterialReactTable
         columns={columns}
-        data={post}
+        data={posts}
         enableGlobalFilter
         state={{
           pagination,
@@ -280,31 +270,16 @@ export default function PostsList() {
       />
 
       {/* Posts Drawer for CRUD operations */}
-      <PostsDrawer 
-        open={drawerOpen}
-        mode={drawerMode}
-        onClose={closeDrawer}
-        initialPost={selectedPost}
-        onSaved={(post) => {
-          // Se non c'è un post, chiudi semplicemente il drawer
-          if (!post) {
-            closeDrawer();
-            return;
-          }
-          
-          // Refresh dei posts in lista (aggiungi o modifica)
-          setPosts(prevPosts => {
-            if (drawerMode === "create") {
-              return [...prevPosts, post];
-            } else {
-              return prevPosts
-                .filter(postItem => postItem.id !== post.id)
-                .concat(post);
-            }
-          });
-          closeDrawer();
-        }}
-      />
+<PostsDrawer 
+  open={drawerOpen}
+  mode={drawerMode}
+  onClose={closeDrawer}
+  initialPost={selectedPost}
+  onSaved={() => {
+    closeDrawer();
+    fetchPosts();
+  }}
+/>
 
     </Box>
   );
