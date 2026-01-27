@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getPostById, deletePost } from "../../api/posts.api";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DeleteIcon from "@mui/icons-material/Delete";
 import type { Post } from "../../types/post";
@@ -11,6 +11,7 @@ export default function PostsDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [deleting, setDeleting] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // stato per controllare il dialog
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,25 +49,21 @@ export default function PostsDetails() {
   }, [id]);
 
 
-  //funzione di cancellazione post
-
+  // funzione di cancellazione post
   async function handleDelete() {
-
     if (!id) return;
-
-    const confirmed = window.confirm("Sei sicuro di voler cancellare questo post?");
-    if (!confirmed) return;
 
     try {
       setDeleting(true);
       await deletePost(id);
       navigate("/posts", { replace: true });
-    }catch {
+    } catch {
       setError("Errore nella cancellazione del post.");
     } finally {
       setDeleting(false);
+      setOpenDeleteDialog(false); // chiudi il dialog dopo l'eliminazione
     }
-  };
+  }
 
 if (loading) return <Typography>Caricamento...</Typography>;
 if (error) return <Typography color="error">{error}</Typography>;
@@ -103,14 +100,31 @@ if (!post) return <Typography color="error">Post non trovato.</Typography>;
         variant="contained"
         color="error"
         startIcon={<DeleteIcon />}
-        onClick={handleDelete}
+        onClick={() => setOpenDeleteDialog(true)}
         disabled={deleting}
       >
         {deleting ? "Cancellazione..." : "Cancella Post"}
       </Button>
     </Stack>
 
-
+    <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+      <DialogTitle>Conferma eliminazione</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          Sei sicuro di voler eliminare questo post? Questa azione è irreversibile.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
+          Annulla
+        </Button>
+        <Button onClick={handleDelete} color="error" variant="contained">
+          Elimina
+        </Button>
+      </DialogActions>
+    </Dialog>
      </Box>
+
+
   );
 }

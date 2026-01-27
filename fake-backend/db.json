@@ -123,20 +123,6 @@
   ],
   "posts": [
     {
-      "id": "3",
-      "userId": 3,
-      "title": "TypeScript per principianti",
-      "content": "TypeScript aggiunge tipizzazione statica a JavaScript",
-      "createdAt": "2025-01-18T09:45:00Z"
-    },
-    {
-      "id": "4",
-      "userId": 4,
-      "title": "Guida a Vite",
-      "content": "Vite è un build tool veloce e moderno per progetti web",
-      "createdAt": "2025-01-20T16:30:00Z"
-    },
-    {
       "id": "5",
       "userId": 5,
       "title": "Best practices CSS",
