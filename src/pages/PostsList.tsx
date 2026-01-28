@@ -1,13 +1,15 @@
 // src/pages/PostsList.tsx
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
-import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
-import { useTableState } from "../hook/useTableState"
+import { MaterialReactTable } from "material-react-table";
+import { useTableState } from "../hook/useTableState";
 import { getPosts } from "../api/posts.api";
 import PostsDrawer from "../components/posts/PostsDrawer";
 import type { Post } from "../types/post";
-import { getPostsColumns } from "../components/posts/posts.colums";
+import { usePostsDrawer } from "../hook/usePostsDrawer";
+
+
 
 export default function PostsList() {
   // =======================
@@ -16,6 +18,11 @@ export default function PostsList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // =======================
+  // HOOKS PERSONALIZZATI
+  // =======================
+  const { drawerOpen, drawerMode, selectedPost, columns, openCreate, close } = usePostsDrawer();
 
   // =======================
   // STATE TABELLA PERSISTITO
@@ -53,41 +60,6 @@ export default function PostsList() {
     fetchPosts();
   }, []);
 
-  // =======================
-  // STATE DRAWER
-  // =======================
-  type DrawerMode = "create" | "edit";
-
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState<DrawerMode>("create");
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-
-  function openCreateDrawer() {
-    setDrawerMode("create");
-    setSelectedPost(null);
-    setDrawerOpen(true);
-  }
-
-  function openEditorDrawer(post: Post) {
-    setDrawerMode("edit");
-    setSelectedPost(post);
-    setDrawerOpen(true);
-  }
-
-  function closeDrawer() {
-    setDrawerOpen(false);
-  }
-
-  // =======================
-  // COLONNE (REFactoring)
-  // =======================
-  const columns = useMemo<MRT_ColumnDef<Post>[]>(
-    () =>
-      getPostsColumns({
-        onEdit: openEditorDrawer, 
-      }),
-    []
-  );
 
   // =======================
   // RENDER
@@ -118,7 +90,7 @@ export default function PostsList() {
       >
         <Typography variant="h4">Posts</Typography>
 
-        <Button variant="contained" onClick={openCreateDrawer}>
+        <Button variant="contained" onClick={openCreate}>
           Nuovo Post
         </Button>
       </Stack>
@@ -137,10 +109,10 @@ export default function PostsList() {
       <PostsDrawer
         open={drawerOpen}
         mode={drawerMode}
-        onClose={closeDrawer}
+        onClose={close}
         initialPost={selectedPost}
         onSaved={() => {
-          closeDrawer();
+          close();
           fetchPosts();
         }}
       />
