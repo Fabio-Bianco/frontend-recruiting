@@ -1,47 +1,64 @@
-// src/pages/PostsList.tsx
-
 import { useEffect, useState } from "react";
-import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
-import { MaterialReactTable } from "material-react-table";
-import { useTableState } from "../hook/useTableState";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Stack,
+  Typography,
+  Card,
+  CardContent,
+  CardMedia,
+  Avatar,
+  Chip,
+  IconButton,
+  TextField,
+  MenuItem,
+  Grid,
+  alpha,
+  Divider,
+} from "@mui/material";
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Download as DownloadIcon,
+  FilterList as FilterIcon,
+} from "@mui/icons-material";
 import { getPosts } from "../api/posts.api";
 import PostsDrawer from "../components/posts/PostsDrawer";
 import type { Post } from "../types/post";
 import { usePostsDrawer } from "../hook/usePostsDrawer";
 
+// Immagini placeholder per i posts
+const getPostImage = (postId: string) => {
+  const images = [
+    "https://images.unsplash.com/photo-1555421689-491a97ff2040?w=400&h=200&fit=crop",
+    "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=400&h=200&fit=crop", 
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop",
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=200&fit=crop",
+  ];
+  return images[parseInt(postId) % images.length];
+};
 
+// Categorie per i posts
+const getPostCategory = (postId: string) => {
+  const categories = [
+    { name: "TECH", color: "#1DB584" },
+    { name: "LIFESTYLE", color: "#FF6B6B" },
+    { name: "BUSINESS", color: "#4ECDC4" },
+    { name: "NEWS", color: "#FFE66D" },
+  ];
+  return categories[parseInt(postId) % categories.length];
+};
 
 export default function PostsList() {
-  // =======================
-  // STATE DATI (FETCH)
-  // =======================
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string>("All Categories");
+  
+  const { drawerOpen, drawerMode, selectedPost, openCreate, openEdit, close } = usePostsDrawer();
 
-  // =======================
-  // HOOKS PERSONALIZZATI
-  // =======================
-  const { drawerOpen, drawerMode, selectedPost, columns, openCreate, close } = usePostsDrawer();
-
-  // =======================
-  // STATE TABELLA PERSISTITO
-  // =======================
-  const {
-    pagination,
-    sorting,
-    columnFilters,
-    globalFilter,
-    setPagination,
-    setSorting,
-    setColumnFilters,
-    setGlobalFilter,
-
-  } = useTableState("postsTableState.v1");
-
-  // =======================
-  // FETCH POSTS
-  // =======================
   async function fetchPosts() {
     setLoading(true);
     setErrorMsg(null);
@@ -60,10 +77,19 @@ export default function PostsList() {
     fetchPosts();
   }, []);
 
+  function formatDate(dateString: string) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", { 
+      month: "short", 
+      day: "2-digit", 
+      year: "numeric" 
+    });
+  }
 
-  // =======================
-  // RENDER
-  // =======================
+  function handleEditPost(post: Post) {
+    openEdit(post);
+  }
+
   if (loading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
@@ -82,30 +108,229 @@ export default function PostsList() {
 
   return (
     <Box>
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        sx={{ mb: 2 }}
-      >
-        <Typography variant="h4">Posts</Typography>
+      {/* Header */}
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
+            Posts Management
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                bgcolor: "success.main",
+              }}
+            />
+            <Typography variant="body2" color="text.secondary">
+              {posts.length}/2 Total Published Posts
+            </Typography>
+          </Box>
+        </Box>
+        
+        <Stack direction="row" spacing={2}>
+          <IconButton
+            sx={{
+              bgcolor: alpha("#ffffff", 0.1),
+              "&:hover": { bgcolor: alpha("#ffffff", 0.2) },
+            }}
+          >
+            <DownloadIcon />
+          </IconButton>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={openCreate}
+            sx={{
+              bgcolor: "primary.main",
+              "&:hover": { bgcolor: "primary.dark" },
+            }}
+          >
+            Create New Post
+          </Button>
+        </Stack>
+      </Stack>
 
-        <Button variant="contained" onClick={openCreate}>
-          Nuovo Post
+      {/* Filters */}
+      <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+        <TextField
+          placeholder="Filter by title"
+          variant="outlined"
+          size="small"
+          sx={{
+            minWidth: 200,
+            "& .MuiOutlinedInput-root": {
+              bgcolor: alpha("#ffffff", 0.05),
+            },
+          }}
+        />
+        <TextField
+          placeholder="Search author"
+          variant="outlined" 
+          size="small"
+          sx={{
+            minWidth: 150,
+            "& .MuiOutlinedInput-root": {
+              bgcolor: alpha("#ffffff", 0.05),
+            },
+          }}
+        />
+        <TextField
+          select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          size="small"
+          sx={{
+            minWidth: 150,
+            "& .MuiOutlinedInput-root": {
+              bgcolor: alpha("#ffffff", 0.05),
+            },
+          }}
+        >
+          <MenuItem value="All Categories">All Categories</MenuItem>
+          <MenuItem value="TECH">TECH</MenuItem>
+          <MenuItem value="LIFESTYLE">LIFESTYLE</MenuItem>
+          <MenuItem value="BUSINESS">BUSINESS</MenuItem>
+          <MenuItem value="NEWS">NEWS</MenuItem>
+        </TextField>
+        <TextField
+          placeholder="YYYY-MM-DD"
+          variant="outlined"
+          size="small"
+          sx={{
+            minWidth: 130,
+            "& .MuiOutlinedInput-root": {
+              bgcolor: alpha("#ffffff", 0.05),
+            },
+          }}
+        />
+        <Button
+          variant="outlined"
+          startIcon={<FilterIcon />}
+          sx={{ minWidth: 100 }}
+        >
+          CLEAR
         </Button>
       </Stack>
 
-      <MaterialReactTable
-        columns={columns}
-        data={posts}
-        enableGlobalFilter
-        state={{ pagination, sorting, columnFilters, globalFilter }}
-        onPaginationChange={setPagination}
-        onSortingChange={setSorting}
-        onColumnFiltersChange={setColumnFilters}
-        onGlobalFilterChange={setGlobalFilter}
-      />
+      {/* Posts Cards */}
+      <Stack spacing={2}>
+        {posts.map((post) => {
+          const category = getPostCategory(post.id.toString());
+          
+          return (
+            <Card
+              key={post.id}
+              sx={{
+                display: "flex",
+                bgcolor: "background.paper",
+                border: 1,
+                borderColor: "divider",
+                "&:hover": {
+                  borderColor: "primary.main",
+                  bgcolor: alpha("#1DB584", 0.02),
+                },
+                transition: "all 0.2s",
+              }}
+            >
+              {/* Post Image */}
+              <CardMedia
+                component="img"
+                sx={{
+                  width: 120,
+                  height: 120,
+                  objectFit: "cover",
+                }}
+                image={getPostImage(post.id.toString())}
+                alt={post.title}
+              />
+              
+              {/* Content */}
+              <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <Box sx={{ flex: 1, mr: 2 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                      {post.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      {post.content || "Exploring how LLMs are reshaping the UI/UX landscape..."}
+                    </Typography>
+                    
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <Avatar
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          bgcolor: "primary.main",
+                          fontSize: "0.875rem",
+                        }}
+                      >
+                        JC
+                      </Avatar>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          Jane Cooper
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {formatDate(post.createdAt || new Date().toISOString())}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Box>
 
+                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
+                    {/* Category Badge */}
+                    <Chip
+                      label={category.name}
+                      size="small"
+                      sx={{
+                        bgcolor: category.color,
+                        color: "white",
+                        fontWeight: 600,
+                        fontSize: "0.75rem",
+                      }}
+                    />
+                    
+                    {/* Actions */}
+                    <Stack direction="row" spacing={1}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleEditPost(post)}
+                        sx={{
+                          "&:hover": { bgcolor: alpha("#1DB584", 0.1) },
+                        }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        sx={{
+                          "&:hover": { bgcolor: alpha("#FF6B6B", 0.1) },
+                        }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Stack>
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </Stack>
+
+      {/* Pagination Footer */}
+      <Box sx={{ mt: 4, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Typography variant="body2" color="text.secondary">
+          ROWS PER PAGE: 10
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          1-10 OF 842
+        </Typography>
+      </Box>
+
+      {/* Drawer */}
       <PostsDrawer
         open={drawerOpen}
         mode={drawerMode}

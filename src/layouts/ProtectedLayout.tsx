@@ -9,8 +9,6 @@ import {
   Typography,
   IconButton,
   Avatar,
-  InputBase,
-  Badge,
   ListItem,
   ListItemButton,
   ListItemIcon,
@@ -19,13 +17,11 @@ import {
 } from "@mui/material";
 import {
   Menu as MenuIcon,
-  Search as SearchIcon,
   Dashboard as DashboardIcon,
   Article as PostsIcon,
   People as UsersIcon,
   Analytics as AnalyticsIcon,
   Settings as SettingsIcon,
-  Notifications as NotificationsIcon,
   AccountCircle as AccountIcon,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
@@ -46,9 +42,11 @@ export default function ProtectedLayout() {
   const location = useLocation();
   const { user, logout } = useAuth();
 
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
 
   const drawer = (
     <Box>
@@ -81,7 +79,7 @@ export default function ProtectedLayout() {
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
-          
+
           return (
             <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
               <ListItemButton
@@ -99,11 +97,11 @@ export default function ProtectedLayout() {
                 <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
                   <Icon />
                 </ListItemIcon>
-                <ListItemText 
-                  primary={item.text} 
-                  primaryTypographyProps={{ 
-                    fontWeight: isActive ? 600 : 400 
-                  }} 
+                <ListItemText
+                  primary={item.text}
+                  primaryTypographyProps={{
+                    fontWeight: isActive ? 600 : 400
+                  }}
                 />
               </ListItemButton>
             </ListItem>
@@ -161,58 +159,10 @@ export default function ProtectedLayout() {
             <MenuIcon />
           </IconButton>
 
-          {/* Search */}
-          <Box
-            sx={{
-              position: "relative",
-              borderRadius: 2,
-              bgcolor: alpha("#ffffff", 0.05),
-              border: 1,
-              borderColor: "divider",
-              "&:hover": {
-                bgcolor: alpha("#ffffff", 0.08),
-              },
-              marginRight: 2,
-              marginLeft: 0,
-              width: "100%",
-              maxWidth: 400,
-            }}
-          >
-            <Box
-              sx={{
-                padding: "0 16px",
-                height: "100%",
-                position: "absolute",
-                pointerEvents: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <SearchIcon sx={{ color: "text.secondary" }} />
-            </Box>
-            <InputBase
-              placeholder="Global search..."
-              sx={{
-                color: "inherit",
-                width: "100%",
-                "& .MuiInputBase-input": {
-                  padding: "12px 12px 12px 48px",
-                },
-              }}
-            />
-          </Box>
-
           <Box sx={{ flexGrow: 1 }} />
 
           {/* Right side icons */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <IconButton color="inherit">
-              <Badge badgeContent={3} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            
             <IconButton color="inherit" onClick={logout}>
               <AccountIcon />
             </IconButton>
