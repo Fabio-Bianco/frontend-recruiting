@@ -1,7 +1,4 @@
-import { useNavigate } from "react-router-dom";
-
-import { useTableState } from "../hook/useTableState"; // 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -16,9 +13,7 @@ import {
   IconButton,
   TextField,
   MenuItem,
-
   alpha,
-
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -28,7 +23,7 @@ import {
   FilterList as FilterIcon,
   Visibility as ViewIcon,
 } from "@mui/icons-material";
-
+import { useNavigate } from "react-router-dom";
 import { getPosts } from "../api/posts.api";
 import PostsDrawer from "../components/posts/PostsDrawer";
 import type { Post } from "../types/post";
@@ -38,7 +33,7 @@ import { usePostsDrawer } from "../hook/usePostsDrawer";
 const getPostImage = (postId: string) => {
   const images = [
     "https://images.unsplash.com/photo-1555421689-491a97ff2040?w=400&h=200&fit=crop",
-    "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=400&h=200&fit=crop",
+    "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=400&h=200&fit=crop", 
     "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop",
     "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=200&fit=crop",
   ];
@@ -60,19 +55,10 @@ export default function PostsList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string>("All Categories");
   const navigate = useNavigate();
-
+  
   const { drawerOpen, drawerMode, selectedPost, openCreate, openEdit, close } = usePostsDrawer();
-  const {
-    pagination,
-    sorting,
-    columnFilters,
-    globalFilter,
-    setPagination,
-    setSorting,
-    setColumnFilters,
-    setGlobalFilter,
-  } = useTableState("postsTableState.v1");
 
   async function fetchPosts() {
     setLoading(true);
@@ -94,10 +80,10 @@ export default function PostsList() {
 
   function formatDate(dateString: string) {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric"
+    return date.toLocaleDateString("en-US", { 
+      month: "short", 
+      day: "2-digit", 
+      year: "numeric" 
     });
   }
 
@@ -108,66 +94,6 @@ export default function PostsList() {
   function handleViewPost(postId: number) {
     navigate(`/posts/${postId}`);
   }
-
-  function clearAllFilters() {
-    setGlobalFilter("");
-    setColumnFilters([]);
-    setSorting([]);
-  }
-
-  const filteredAndSortedPosts = useMemo(() => {
-    let filtered = [...posts];
-
-    // Filtro globale
-    if (globalFilter) {
-      filtered = filtered.filter(post =>
-        post.title.toLowerCase().includes(globalFilter.toLowerCase()) ||
-        post.content?.toLowerCase().includes(globalFilter.toLowerCase())
-      );
-    }
-
-    // Filtro per titolo (da columnFilters)
-    const titleFilter = columnFilters.find(filter => filter.id === 'title');
-    if (titleFilter?.value) {
-      filtered = filtered.filter(post =>
-        post.title.toLowerCase().includes(String(titleFilter.value).toLowerCase())
-      );
-    }
-
-    // Filtro per categoria (da columnFilters)
-    const categoryFilter = columnFilters.find(filter => filter.id === 'category');
-    if (categoryFilter?.value && categoryFilter.value !== "All Categories") {
-      filtered = filtered.filter(post =>
-        getPostCategory(post.id.toString()).name === categoryFilter.value
-      );
-    }
-
-    // Ordinamento (da sorting)
-    if (sorting.length > 0) {
-      const sortField = sorting[0];
-      filtered.sort((a, b) => {
-        let comparison = 0;
-
-        switch (sortField.id) {
-          case "title":
-            comparison = a.title.localeCompare(b.title);
-            break;
-          case "date":
-            comparison = new Date(a.createdAt || "").getTime() - new Date(b.createdAt || "").getTime();
-            break;
-          case "userId":
-            comparison = a.userId - b.userId;
-            break;
-          default:
-            comparison = 0;
-        }
-
-        return sortField.desc ? -comparison : comparison;
-      });
-    }
-
-    return filtered;
-  }, [posts, globalFilter, columnFilters, sorting]);
 
   if (loading) {
     return (
@@ -207,7 +133,7 @@ export default function PostsList() {
             </Typography>
           </Box>
         </Box>
-
+        
         <Stack direction="row" spacing={2}>
           <IconButton
             sx={{
@@ -232,13 +158,11 @@ export default function PostsList() {
       </Stack>
 
       {/* Filters */}
-      <Stack direction="row" spacing={2} sx={{ mb: 3 }} flexWrap="wrap">
+      <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
         <TextField
-          placeholder="Global search..."
+          placeholder="Filter by title"
           variant="outlined"
           size="small"
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
           sx={{
             minWidth: 200,
             "& .MuiOutlinedInput-root": {
@@ -247,19 +171,11 @@ export default function PostsList() {
           }}
         />
         <TextField
-          placeholder="Filter by title"
-          variant="outlined"
+          placeholder="Search author"
+          variant="outlined" 
           size="small"
-          value={columnFilters.find(f => f.id === 'title')?.value || ''}
-          onChange={(e) => {
-            const newFilters = columnFilters.filter(f => f.id !== 'title');
-            if (e.target.value) {
-              newFilters.push({ id: 'title', value: e.target.value });
-            }
-            setColumnFilters(newFilters);
-          }}
           sx={{
-            minWidth: 200,
+            minWidth: 150,
             "& .MuiOutlinedInput-root": {
               bgcolor: alpha("#ffffff", 0.05),
             },
@@ -267,14 +183,8 @@ export default function PostsList() {
         />
         <TextField
           select
-          value={columnFilters.find(f => f.id === 'category')?.value || 'All Categories'}
-          onChange={(e) => {
-            const newFilters = columnFilters.filter(f => f.id !== 'category');
-            if (e.target.value !== 'All Categories') {
-              newFilters.push({ id: 'category', value: e.target.value });
-            }
-            setColumnFilters(newFilters);
-          }}
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
           size="small"
           sx={{
             minWidth: 150,
@@ -290,46 +200,19 @@ export default function PostsList() {
           <MenuItem value="NEWS">NEWS</MenuItem>
         </TextField>
         <TextField
-          select
-          value={sorting[0]?.id || 'date'}
-          onChange={(e) => {
-            const currentDesc = sorting[0]?.desc || false;
-            setSorting([{ id: e.target.value, desc: currentDesc }]);
-          }}
+          placeholder="YYYY-MM-DD"
+          variant="outlined"
           size="small"
           sx={{
-            minWidth: 120,
+            minWidth: 130,
             "& .MuiOutlinedInput-root": {
               bgcolor: alpha("#ffffff", 0.05),
             },
           }}
-        >
-          <MenuItem value="date">Sort by Date</MenuItem>
-          <MenuItem value="title">Sort by Title</MenuItem>
-          <MenuItem value="userId">Sort by Author</MenuItem>
-        </TextField>
-        <TextField
-          select
-          value={sorting[0]?.desc ? 'desc' : 'asc'}
-          onChange={(e) => {
-            const currentId = sorting[0]?.id || 'date';
-            setSorting([{ id: currentId, desc: e.target.value === 'desc' }]);
-          }}
-          size="small"
-          sx={{
-            minWidth: 100,
-            "& .MuiOutlinedInput-root": {
-              bgcolor: alpha("#ffffff", 0.05),
-            },
-          }}
-        >
-          <MenuItem value="asc">ASC</MenuItem>
-          <MenuItem value="desc">DESC</MenuItem>
-        </TextField>
+        />
         <Button
           variant="outlined"
           startIcon={<FilterIcon />}
-          onClick={clearAllFilters}
           sx={{ minWidth: 100 }}
         >
           CLEAR
@@ -338,9 +221,9 @@ export default function PostsList() {
 
       {/* Posts Cards */}
       <Stack spacing={2}>
-        {filteredAndSortedPosts.map((post) => {
+        {posts.map((post) => {
           const category = getPostCategory(post.id.toString());
-
+          
           return (
             <Card
               key={post.id}
@@ -367,7 +250,7 @@ export default function PostsList() {
                 image={getPostImage(post.id.toString())}
                 alt={post.title}
               />
-
+              
               {/* Content */}
               <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -378,7 +261,7 @@ export default function PostsList() {
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                       {post.content || "Exploring how LLMs are reshaping the UI/UX landscape..."}
                     </Typography>
-
+                    
                     <Stack direction="row" spacing={2} alignItems="center">
                       <Avatar
                         sx={{
@@ -413,7 +296,7 @@ export default function PostsList() {
                         fontSize: "0.75rem",
                       }}
                     />
-
+                    
                     {/* Actions */}
                     <Stack direction="row" spacing={1}>
                       <IconButton
@@ -454,10 +337,10 @@ export default function PostsList() {
       {/* Pagination Footer */}
       <Box sx={{ mt: 4, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Typography variant="body2" color="text.secondary">
-          ROWS PER PAGE: {pagination.pageSize}
+          ROWS PER PAGE: 10
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          1-{Math.min(pagination.pageSize, filteredAndSortedPosts.length)} OF {filteredAndSortedPosts.length}
+          1-10 OF 842
         </Typography>
       </Box>
 
