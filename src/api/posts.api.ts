@@ -10,9 +10,7 @@ export type PostPayload = {
 
 // Funzione che recupera tutti i post dal backend
 export async function getPosts(): Promise<Post[]> {
-    // Chiamata HTTP GET verso /posts
   const response = await apiClient.get<Post[]>("/posts");
-  //Ritorniamo solo i dati JSON
   return response.data;
 
 }
@@ -30,11 +28,10 @@ export async function getPostById(id: string): Promise<Post> {
 
 
 export async function getPostsByUserId (userId: number): Promise<Post[]> {
-
-  const {data} = await apiClient.get<Post[]>("/posts", {
-    params : {userId}, 
+const {data} = await apiClient.get<Post[]>("/posts", {
+    params: { userId }
   });
-  return data
+  return data;
 }
 
 
