@@ -1,4 +1,7 @@
 // src/table/tablePersistence.ts
+
+
+
 // Utility per la gestione dello stato persistito della tabella (“Ogni tabella persistita deve avere sempre questa forma e partire sempre da questi valori di default”)
 import type {
   MRT_PaginationState,

@@ -1,3 +1,5 @@
+// src/components/posts/posts.colums.tsx
+
 import {Stack, Button, } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import type { MRT_ColumnDef } from "material-react-table";

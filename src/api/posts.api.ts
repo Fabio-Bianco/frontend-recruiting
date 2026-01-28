@@ -1,3 +1,6 @@
+// src/api/posts.api.ts
+
+
 import { apiClient } from "./client";
 import type { Post } from "../types/post";
 
