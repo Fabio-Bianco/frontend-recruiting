@@ -24,6 +24,8 @@ export default function App() {
           <Route path="/posts/:id" element={<PostsDetails />} />
           <Route path="/users" element={<UsersList />} />
           <Route path="/users/:id" element={<UserDetail />} />
+          <Route path="/analytics" element={<div>Not Found</div>} />
+          <Route path="/settings" element={<div>Not Found</div>} />
         </Route>
       </Route>
     </Routes>
