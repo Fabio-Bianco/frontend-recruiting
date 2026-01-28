@@ -23,6 +23,20 @@ export async function getPostById(id: string): Promise<Post> {
   return data;
 }
 
+/**
+ * GET /posts?userId=...
+ * Torna tutti i post associati a un utente specifico.
+ */
+
+
+export async function getPostsByUserId (userId: number): Promise<Post[]> {
+
+  const {data} = await apiClient.get<Post[]>("/posts", {
+    params : {userId}, 
+  });
+  return data
+}
+
 
 // Funzione che cancella un post dato il suo ID
 // Nota: id è string perché lo passiamo direttamente da useParams.
