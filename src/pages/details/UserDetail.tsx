@@ -1,5 +1,8 @@
 
 import { useEffect, useState } from "react";
+import {Link as RouterLink} from "react-router-dom";
+import { getPostsByUserId } from "../../api/posts.api";
+import type { Post } from "../../types/post";
 import { useParams, useNavigate } from "react-router-dom";
 import { getUserById, deleteUser } from "../../api/users.api"; // Corretto percorso
 import { Box, Button, Stack, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
@@ -15,7 +18,13 @@ export default function UserDetail() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [userPosts, setUserPosts] = useState<Post[]>([]);
+  const [postsLoading, setPostsLoading] = useState(false);
+  const [postsError, setPostsError] = useState<string | null>(null);
+  
+  
+  
+  
   useEffect(() => {
     async function loadUser() {
       if (!id) return;
@@ -57,16 +66,45 @@ export default function UserDetail() {
     }
   }
 
+
+  useEffect(() => {
+    async function loadUserPosts() {
+      if (!id) return;
+
+      // id da useParams è string → la convertiamo a number
+
+      const userIdNum = Number(id);
+
+      if (Number.isNaN(userIdNum))
+        return;
+
+      setPostsLoading(true);
+      setPostsError(null);
+
+      try {
+        const posts = await getPostsByUserId(userIdNum);
+        setUserPosts(posts);
+      } catch (err) {
+        setPostsError("Errore nel caricamento dei post.");
+      } finally {
+        setPostsLoading(false);
+      }
+    }
+
+    loadUserPosts();
+}, [id]);
+
   if (loading) return <Typography>Caricamento...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
   if (!user) return <Typography color="error">Utente non trovato.</Typography>;
 
-  return (
+   return (
     <Box>
       <Typography variant="h4" sx={{ mb: 2 }}>
         Dettaglio Utente
       </Typography>
 
+      {/* Dati utente */}
       <Box sx={{ mb: 2 }}>
         <Typography variant="h6">Nome: {user.name}</Typography>
         <Typography variant="body1" sx={{ mt: 1, mb: 2 }}>
@@ -77,7 +115,58 @@ export default function UserDetail() {
         </Typography>
       </Box>
 
-      <Stack direction="row" spacing={2}>
+      {/* Relazione: posts dell'utente */}
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h6" sx={{ mb: 1 }}>
+          Posts dell'utente
+        </Typography>
+
+        {postsLoading && <Typography>Caricamento post...</Typography>}
+
+        {postsError && (
+          <Typography color="error" sx={{ mb: 1 }}>
+            {postsError}
+          </Typography>
+        )}
+
+        {!postsLoading && !postsError && userPosts.length === 0 && (
+          <Typography color="text.secondary">
+            Nessun post associato a questo utente.
+          </Typography>
+        )}
+
+        {!postsLoading && !postsError && userPosts.length > 0 && (
+          <Stack spacing={1} sx={{ mt: 1 }}>
+            {userPosts.map((p) => (
+              <Box
+                key={p.id}
+                sx={{
+                  p: 1.5,
+                  border: "1px solid",
+                  borderColor: "divider",
+                  borderRadius: 2,
+                }}
+              >
+                <Typography variant="subtitle1" sx={{ mb: 0.5 }}>
+                  {p.title}
+                </Typography>
+
+                <Button
+                  component={RouterLink}
+                  to={`/posts/${p.id}`}
+                  size="small"
+                  variant="outlined"
+                >
+                  Apri post
+                </Button>
+              </Box>
+            ))}
+          </Stack>
+        )}
+      </Box>
+
+      {/* Azioni */}
+      <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
         <Button
           variant="outlined"
           startIcon={<ArrowBackIcon />}
@@ -97,6 +186,7 @@ export default function UserDetail() {
         </Button>
       </Stack>
 
+      {/* Dialog conferma delete */}
       <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
         <DialogTitle>Conferma eliminazione</DialogTitle>
         <DialogContent>
@@ -105,7 +195,7 @@ export default function UserDetail() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
+          <Button onClick={() => setOpenDeleteDialog(false)}>
             Annulla
           </Button>
           <Button onClick={handleDelete} color="error" variant="contained">
