@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import {
   Edit as EditIcon,
+  Delete as DeleteIcon,
   Visibility as ViewIcon,
 } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
@@ -46,12 +47,15 @@ const getAvatarColor = (userId: string) => {
 type UserColumns = {
   // Funzione chiamata quando si clicca su "Modifica" in una riga
   onEdit: (user: User) => void;
+  // Funzione chiamata quando si clicca su "Elimina" in una riga
+  onDelete: (userId: number) => void;
   // Funzione chiamata quando si clicca su "Visualizza" in una riga  
   onView: (userId: number) => void;
 };
 
 export function getUsersColumns({
   onEdit,
+  onDelete,
   onView,
 }: UserColumns): MRT_ColumnDef<User>[] {
   return [
@@ -141,7 +145,7 @@ export function getUsersColumns({
     {
       id: "actions",
       header: "Azioni",
-      size: 120,
+      size: 150,
       enableSorting: false,
       enableColumnFilter: false,
       Cell: ({ row }) => (
@@ -159,6 +163,13 @@ export function getUsersColumns({
             sx={{ "&:hover": { bgcolor: alpha("#1DB584", 0.1) } }}
           >
             <EditIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={() => onDelete(row.original.id)}
+            sx={{ "&:hover": { bgcolor: alpha("#FF6B6B", 0.1) } }}
+          >
+            <DeleteIcon fontSize="small" />
           </IconButton>
         </Stack>
       ),

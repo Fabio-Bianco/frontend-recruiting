@@ -19,7 +19,7 @@ import {
 } from "material-react-table";
 
 import { useTableState } from "../hook/useTableState";
-import { getUsers } from "../api/users.api";
+import { getUsers, deleteUser } from "../api/users.api";
 import UsersDrawer from "../components/users/UsersDrawer";
 import type { User } from "../types/user";
 import { useUsersDrawer } from "../hook/useUsersDrawer";
@@ -69,10 +69,22 @@ export default function UsersList() {
     navigate(`/users/${userId}`);
   }
 
+  async function handleDeleteUser(userId: number) {
+    if (confirm("Sei sicuro di voler eliminare questo utente?")) {
+      try {
+        await deleteUser(userId.toString());
+        await fetchUsers(); // Ricarica i dati
+      } catch (error) {
+        console.error("Errore nell'eliminazione dell'utente:", error);
+      }
+    }
+  }
+
   // Definizione delle colonne usando la funzione importata
   const columns = useMemo(
     () => getUsersColumns({
       onEdit: handleEditUser,
+      onDelete: handleDeleteUser,
       onView: handleViewUser,
     }),
     []

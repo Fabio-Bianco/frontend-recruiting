@@ -154,6 +154,23 @@ export function getPostsColumns({
           </Box>
         </Stack>
       ),
+      filterVariant: "select",
+      filterSelectOptions: [
+        { text: "User #1", value: "1" },
+        { text: "User #2", value: "2" },
+        { text: "User #3", value: "3" },
+        { text: "User #4", value: "4" },
+        { text: "User #5", value: "5" },
+        { text: "User #6", value: "6" },
+        { text: "User #7", value: "7" },
+        { text: "User #8", value: "8" },
+        { text: "User #9", value: "9" },
+        { text: "User #10", value: "10" },
+      ],
+      filterFn: (row, id, filterValue) => {
+        if (!filterValue) return true;
+        return row.original.userId.toString() === filterValue;
+      },
     },
     {
       accessorKey: "createdAt",
