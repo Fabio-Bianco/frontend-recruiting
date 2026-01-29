@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import type { User } from '../types/user';
 
-type DrawerMode = 'create' | 'edit';
-
 export function useUsersDrawer() {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState<DrawerMode>('create');
+  const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('create');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const openCreate = () => {
@@ -25,12 +23,5 @@ export function useUsersDrawer() {
     setSelectedUser(null);
   };
 
-  return {
-    drawerOpen,
-    drawerMode,
-    selectedUser,
-    openCreate,
-    openEdit,
-    close,
-  };
+  return { drawerOpen, drawerMode, selectedUser, openCreate, openEdit, close };
 }

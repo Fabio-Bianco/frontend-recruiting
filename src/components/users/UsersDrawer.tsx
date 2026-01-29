@@ -1,85 +1,52 @@
-import { Drawer, Box, Stack, Typography, Divider, TextField, Button } from "@mui/material";
+import { Drawer, Box, Stack, Typography, Button, TextField } from "@mui/material";
 import type { User } from "../../types/user";
 import { createUser, updateUser } from "../../api/users.api";
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
-// Tipo per la modalità del Drawer
 type DrawerMode = "create" | "edit";
 
-// Props del componente Drawer
-// Questo è il “contratto” tra UsersList (padre) e UsersDrawer (figlio)
 interface UsersDrawerProps {
-    open: boolean;
-    mode: DrawerMode;
-    initialUser: User | null;
-    onClose: () => void;
-    onSaved: (user?: User) => void;
+  open: boolean;
+  mode: DrawerMode;
+  initialUser: User | null;
+  onClose: () => void;
+  onSaved: (user?: User) => void;
 }
 
 export default function UsersDrawer({
-    open,
-    mode,
-    initialUser,
-    onClose,
-    onSaved,
+  open,
+  mode,
+  initialUser,
+  onClose,
+  onSaved,
 }: UsersDrawerProps) {
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [submitting, setSubmitting] = useState(false);
 
+  const title = mode === "create" ? "Nuovo Utente" : "Modifica Utente";
 
-/**
-* STATE DEL FORM
-*/
-
-const [name, setName] = useState<string>("");
-const [email, setEmail] = useState<string>(""); 
-const [password, setPassword] = useState<string>("");
-const [submitting, setSubmitting] = useState(false);
-const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-// Titolo dinamico in base alla modalità
-const title = mode === "create" ? "Nuovo Utente" : "Modifica Utente";
-
-/**
-* PREFILL / RESET AUTOMATICO
-*/
-
-useEffect(() => {
-    setErrorMsg(null);
-
+  useEffect(() => {
     if (!open) return;
 
-    if (mode === "edit" && initialUser) {
-        setName(initialUser.name);
-        setEmail(initialUser.email);
-        setPassword(initialUser.password);
-    } else {
-        setName("");
-        setEmail("");
-        setPassword("");
-    }   
-}, [open, mode, initialUser]);  
-
-/**
-* FUNZIONE DI SALVATAGGIO
-*/
-
-
-async function handleSubmit() {
-    setErrorMsg(null);
-
-    // Validazioni base
-    if (name.trim() === "" || email.trim() === "" || password.trim() === "") {
-        setErrorMsg("Tutti i campi sono obbligatori.");
-        return;
+    if (mode === "create") {
+      setName("");
+      setEmail("");
+      setPassword("");
+    } else if (initialUser) {
+      setName(initialUser.name);
+      setEmail(initialUser.email);
+      setPassword(initialUser.password);
     }
+  }, [open, mode, initialUser]);
 
-    const payload = {
-      name: name.trim(),
-      email: email.trim(),
-      password: password.trim(),
-    };
+  async function handleSubmit() {
+    if (!name || !email || !password) return;
 
+    setSubmitting(true);
     try {
-      setSubmitting(true);
+      const payload = { name, email, password };
 
       if (mode === "create") {
         await createUser(payload);
@@ -89,7 +56,7 @@ async function handleSubmit() {
 
       onSaved();
     } catch {
-      setErrorMsg("Errore durante il salvataggio.");
+      // Errori ignorati per semplicità
     } finally {
       setSubmitting(false);
     }
@@ -97,27 +64,16 @@ async function handleSubmit() {
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
-      <Box sx={{ width: 420, p: 2 }}>
-        {/* Header */}
-        <Typography variant="h6" sx={{ mb: 0.5 }}>
+      <Box sx={{ width: 400, p: 3 }}>
+        <Typography variant="h6" sx={{ mb: 3 }}>
           {title}
         </Typography>
 
-        <Typography variant="body2" sx={{ mb: 2 }} color="text.secondary">
-          {mode === "edit"
-            ? `Stai modificando l'utente ID: ${initialUser?.id ?? ""}`
-            : "Stai creando un nuovo utente."}
-        </Typography>
-
-        <Divider sx={{ mb: 2 }} />
-
-        {/* Form */}
         <Stack spacing={2}>
           <TextField
             label="Nome"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required
             fullWidth
           />
 
@@ -125,35 +81,28 @@ async function handleSubmit() {
             label="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
-            fullWidth
             type="email"
+            fullWidth
           />
 
           <TextField
             label="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
-            fullWidth
             type="password"
+            fullWidth
           />
 
-          {/* Messaggio di errore */}
-          {errorMsg && (
-            <Typography color="error" variant="body2">
-              {errorMsg}
-            </Typography>
-          )}
-
-          {/* Footer con azioni */}
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button variant="outlined" onClick={onClose} disabled={submitting}>
+          <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+            <Button onClick={onClose} disabled={submitting}>
               Annulla
             </Button>
-
-            <Button variant="contained" onClick={handleSubmit} disabled={submitting}>
-              {submitting ? "Salvataggio..." : "Salva"}
+            <Button 
+              variant="contained" 
+              onClick={handleSubmit} 
+              disabled={submitting}
+            >
+              {submitting ? "Salvando..." : "Salva"}
             </Button>
           </Stack>
         </Stack>
