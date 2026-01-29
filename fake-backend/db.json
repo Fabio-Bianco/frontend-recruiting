@@ -117,6 +117,34 @@
   ],
   "posts": [
     {
+      "id": "1",
+      "userId": 2,
+      "title": "Introduzione a React",
+      "content": "Guida completa per iniziare con React.js e i suoi componenti",
+      "createdAt": "2025-01-18T09:30:00Z"
+    },
+    {
+      "id": "2",
+      "userId": 3,
+      "title": "JavaScript ES6+",
+      "content": "Le nuove funzionalità di JavaScript e come utilizzarle",
+      "createdAt": "2025-01-19T14:15:00Z"
+    },
+    {
+      "id": "3",
+      "userId": 4,
+      "title": "TypeScript per principianti",
+      "content": "Come iniziare con TypeScript per progetti più robusti",
+      "createdAt": "2025-01-20T16:45:00Z"
+    },
+    {
+      "id": "4",
+      "userId": 2,
+      "title": "Hooks in React",
+      "content": "Utilizzo avanzato degli Hooks di React per gestire lo stato",
+      "createdAt": "2025-01-21T10:20:00Z"
+    },
+    {
       "id": "5",
       "userId": 5,
       "title": "Best practices CSS",
