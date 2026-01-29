@@ -108,41 +108,6 @@ export function getUsersColumns({
       ),
     },
     {
-      accessorKey: "phone",
-      header: "Telefono",
-      size: 150,
-      Cell: ({ cell }) => (
-        <Typography variant="body2">
-          {cell.getValue<string>()}
-        </Typography>
-      ),
-    },
-    {
-      accessorKey: "website",
-      header: "Website",
-      size: 150,
-      Cell: ({ cell }) => (
-        <Typography variant="body2" color="primary.main">
-          {cell.getValue<string>()}
-        </Typography>
-      ),
-    },
-    {
-      accessorKey: "company.name",
-      header: "Azienda",
-      size: 180,
-      Cell: ({ row }) => (
-        <Box>
-          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-            {row.original.company?.name || "N/A"}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {row.original.company?.catchPhrase || ""}
-          </Typography>
-        </Box>
-      ),
-    },
-    {
       id: "actions",
       header: "Azioni",
       size: 150,

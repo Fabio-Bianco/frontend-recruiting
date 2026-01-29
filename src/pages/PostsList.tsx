@@ -32,6 +32,8 @@ export default function PostsList() {
   const navigate = useNavigate();
 
   const { drawerOpen, drawerMode, selectedPost, openCreate, openEdit, close } = usePostsDrawer();
+  
+  //DESTRUTTURAZIONE DELLO STATO DELLA TABELLA TRAMITE IL CUSTOM HOOK
   const {
     pagination,
     sorting,
@@ -93,6 +95,8 @@ export default function PostsList() {
   const table = useMaterialReactTable({
     columns,
     data: posts,
+
+    
     // Stato della tabella
     state: {
       pagination,

@@ -129,50 +129,6 @@ export function getPostsColumns({
       },
     },
     {
-      accessorKey: "userId",
-      header: "Autore",
-      size: 150,
-      Cell: ({ cell }) => (
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Avatar
-            sx={{
-              width: 32,
-              height: 32,
-              bgcolor: "primary.main",
-              fontSize: "0.75rem",
-            }}
-          >
-            JC
-          </Avatar>
-          <Box>
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              Jane Cooper
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              User #{cell.getValue<number>()}
-            </Typography>
-          </Box>
-        </Stack>
-      ),
-      filterVariant: "select",
-      filterSelectOptions: [
-        { text: "User #1", value: "1" },
-        { text: "User #2", value: "2" },
-        { text: "User #3", value: "3" },
-        { text: "User #4", value: "4" },
-        { text: "User #5", value: "5" },
-        { text: "User #6", value: "6" },
-        { text: "User #7", value: "7" },
-        { text: "User #8", value: "8" },
-        { text: "User #9", value: "9" },
-        { text: "User #10", value: "10" },
-      ],
-      filterFn: (row, id, filterValue) => {
-        if (!filterValue) return true;
-        return row.original.userId.toString() === filterValue;
-      },
-    },
-    {
       accessorKey: "createdAt",
       header: "Data Creazione",
       size: 140,
