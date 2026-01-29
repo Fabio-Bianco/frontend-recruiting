@@ -1,6 +1,4 @@
 import { useNavigate } from "react-router-dom";
-
-import { useTableState } from "../hook/useTableState"; // 
 import { useEffect, useState, useMemo } from "react";
 import {
   Box,
@@ -8,53 +6,24 @@ import {
   CircularProgress,
   Stack,
   Typography,
-  Card,
-  CardContent,
-  CardMedia,
-  Avatar,
-  Chip,
   IconButton,
-  TextField,
-  MenuItem,
-
   alpha,
-
 } from "@mui/material";
 import {
   Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
   Download as DownloadIcon,
-  FilterList as FilterIcon,
-  Visibility as ViewIcon,
 } from "@mui/icons-material";
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+} from "material-react-table";
 
-import { getPosts } from "../api/posts.api";
+import { useTableState } from "../hook/useTableState";
+import { getPosts, deletePost } from "../api/posts.api";
 import PostsDrawer from "../components/posts/PostsDrawer";
 import type { Post } from "../types/post";
 import { usePostsDrawer } from "../hook/usePostsDrawer";
-
-// Immagini placeholder per i posts
-const getPostImage = (postId: string) => {
-  const images = [
-    "https://images.unsplash.com/photo-1555421689-491a97ff2040?w=400&h=200&fit=crop",
-    "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=400&h=200&fit=crop",
-    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=200&fit=crop",
-    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=200&fit=crop",
-  ];
-  return images[parseInt(postId) % images.length];
-};
-
-// Categorie per i posts
-const getPostCategory = (postId: string) => {
-  const categories = [
-    { name: "TECH", color: "#1DB584" },
-    { name: "LIFESTYLE", color: "#FF6B6B" },
-    { name: "BUSINESS", color: "#4ECDC4" },
-    { name: "NEWS", color: "#FFE66D" },
-  ];
-  return categories[parseInt(postId) % categories.length];
-};
+import { getPostsColumns } from "../components/posts/posts.colums";
 
 export default function PostsList() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -92,15 +61,6 @@ export default function PostsList() {
     fetchPosts();
   }, []);
 
-  function formatDate(dateString: string) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric"
-    });
-  }
-
   function handleEditPost(post: Post) {
     openEdit(post);
   }
@@ -109,65 +69,101 @@ export default function PostsList() {
     navigate(`/posts/${postId}`);
   }
 
-  function clearAllFilters() {
-    setGlobalFilter("");
-    setColumnFilters([]);
-    setSorting([]);
+  async function handleDeletePost(postId: number) {
+    if (confirm("Sei sicuro di voler eliminare questo post?")) {
+      try {
+        await deletePost(postId.toString());
+        await fetchPosts(); // Ricarica i dati
+      } catch (error) {
+        console.error("Errore nell'eliminazione del post:", error);
+      }
+    }
   }
 
-  const filteredAndSortedPosts = useMemo(() => {
-    let filtered = [...posts];
+  // Definizione delle colonne usando la funzione importata
+  const columns = useMemo(
+    () => getPostsColumns({
+      onEdit: handleEditPost,
+      onDelete: handleDeletePost,
+      onView: handleViewPost,
+    }),
+    []
+  );
 
-    // Filtro globale
-    if (globalFilter) {
-      filtered = filtered.filter(post =>
-        post.title.toLowerCase().includes(globalFilter.toLowerCase()) ||
-        post.content?.toLowerCase().includes(globalFilter.toLowerCase())
-      );
-    }
-
-    // Filtro per titolo (da columnFilters)
-    const titleFilter = columnFilters.find(filter => filter.id === 'title');
-    if (titleFilter?.value) {
-      filtered = filtered.filter(post =>
-        post.title.toLowerCase().includes(String(titleFilter.value).toLowerCase())
-      );
-    }
-
-    // Filtro per categoria (da columnFilters)
-    const categoryFilter = columnFilters.find(filter => filter.id === 'category');
-    if (categoryFilter?.value && categoryFilter.value !== "All Categories") {
-      filtered = filtered.filter(post =>
-        getPostCategory(post.id.toString()).name === categoryFilter.value
-      );
-    }
-
-    // Ordinamento (da sorting)
-    if (sorting.length > 0) {
-      const sortField = sorting[0];
-      filtered.sort((a, b) => {
-        let comparison = 0;
-
-        switch (sortField.id) {
-          case "title":
-            comparison = a.title.localeCompare(b.title);
-            break;
-          case "date":
-            comparison = new Date(a.createdAt || "").getTime() - new Date(b.createdAt || "").getTime();
-            break;
-          case "userId":
-            comparison = a.userId - b.userId;
-            break;
-          default:
-            comparison = 0;
-        }
-
-        return sortField.desc ? -comparison : comparison;
-      });
-    }
-
-    return filtered;
-  }, [posts, globalFilter, columnFilters, sorting]);
+  const table = useMaterialReactTable({
+    columns,
+    data: posts,
+    // Stato della tabella
+    state: {
+      pagination,
+      sorting,
+      columnFilters,
+      globalFilter,
+      isLoading: loading,
+    },
+    // Handlers per lo stato
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    
+    // Opzioni della tabella
+    enableGlobalFilter: true,
+    enableColumnFilters: true,
+    enableSorting: true,
+    enablePagination: true,
+    
+    // UI customization
+    muiTableProps: {
+      sx: {
+        "& .MuiTableHead-root": {
+          "& .MuiTableRow-root": {
+            backgroundColor: alpha("#1DB584", 0.05),
+          },
+        },
+      },
+    },
+    muiTableHeadCellProps: {
+      sx: {
+        fontWeight: 600,
+        fontSize: "0.875rem",
+      },
+    },
+    muiTableBodyRowProps: ({ row }) => ({
+      onClick: () => handleViewPost(row.original.id),
+      sx: {
+        cursor: "pointer",
+        "&:hover": {
+          backgroundColor: alpha("#1DB584", 0.02),
+        },
+      },
+    }),
+    
+    // Toolbar customization
+    renderTopToolbarCustomActions: () => (
+      <Stack direction="row" spacing={2}>
+        <IconButton
+          sx={{
+            bgcolor: alpha("#ffffff", 0.1),
+            "&:hover": { bgcolor: alpha("#ffffff", 0.2) },
+          }}
+        >
+          <DownloadIcon />
+        </IconButton>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={openCreate}
+          sx={{
+            bgcolor: "primary.main",
+            "&:hover": { bgcolor: "primary.dark" },
+          }}
+        >
+          Create New Post
+        </Button>
+      </Stack>
+    ),
+  });
 
   if (loading) {
     return (
@@ -203,263 +199,14 @@ export default function PostsList() {
               }}
             />
             <Typography variant="body2" color="text.secondary">
-              {posts.length}/2 Total Published Posts
+              {posts.length} Total Published Posts
             </Typography>
           </Box>
         </Box>
-
-        <Stack direction="row" spacing={2}>
-          <IconButton
-            sx={{
-              bgcolor: alpha("#ffffff", 0.1),
-              "&:hover": { bgcolor: alpha("#ffffff", 0.2) },
-            }}
-          >
-            <DownloadIcon />
-          </IconButton>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={openCreate}
-            sx={{
-              bgcolor: "primary.main",
-              "&:hover": { bgcolor: "primary.dark" },
-            }}
-          >
-            Create New Post
-          </Button>
-        </Stack>
       </Stack>
 
-      {/* Filters */}
-      <Stack direction="row" spacing={2} sx={{ mb: 3 }} flexWrap="wrap">
-        <TextField
-          placeholder="Global search..."
-          variant="outlined"
-          size="small"
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          sx={{
-            minWidth: 200,
-            "& .MuiOutlinedInput-root": {
-              bgcolor: alpha("#ffffff", 0.05),
-            },
-          }}
-        />
-        <TextField
-          placeholder="Filter by title"
-          variant="outlined"
-          size="small"
-          value={columnFilters.find(f => f.id === 'title')?.value || ''}
-          onChange={(e) => {
-            const newFilters = columnFilters.filter(f => f.id !== 'title');
-            if (e.target.value) {
-              newFilters.push({ id: 'title', value: e.target.value });
-            }
-            setColumnFilters(newFilters);
-          }}
-          sx={{
-            minWidth: 200,
-            "& .MuiOutlinedInput-root": {
-              bgcolor: alpha("#ffffff", 0.05),
-            },
-          }}
-        />
-        <TextField
-          select
-          value={columnFilters.find(f => f.id === 'category')?.value || 'All Categories'}
-          onChange={(e) => {
-            const newFilters = columnFilters.filter(f => f.id !== 'category');
-            if (e.target.value !== 'All Categories') {
-              newFilters.push({ id: 'category', value: e.target.value });
-            }
-            setColumnFilters(newFilters);
-          }}
-          size="small"
-          sx={{
-            minWidth: 150,
-            "& .MuiOutlinedInput-root": {
-              bgcolor: alpha("#ffffff", 0.05),
-            },
-          }}
-        >
-          <MenuItem value="All Categories">All Categories</MenuItem>
-          <MenuItem value="TECH">TECH</MenuItem>
-          <MenuItem value="LIFESTYLE">LIFESTYLE</MenuItem>
-          <MenuItem value="BUSINESS">BUSINESS</MenuItem>
-          <MenuItem value="NEWS">NEWS</MenuItem>
-        </TextField>
-        <TextField
-          select
-          value={sorting[0]?.id || 'date'}
-          onChange={(e) => {
-            const currentDesc = sorting[0]?.desc || false;
-            setSorting([{ id: e.target.value, desc: currentDesc }]);
-          }}
-          size="small"
-          sx={{
-            minWidth: 120,
-            "& .MuiOutlinedInput-root": {
-              bgcolor: alpha("#ffffff", 0.05),
-            },
-          }}
-        >
-          <MenuItem value="date">Sort by Date</MenuItem>
-          <MenuItem value="title">Sort by Title</MenuItem>
-          <MenuItem value="userId">Sort by Author</MenuItem>
-        </TextField>
-        <TextField
-          select
-          value={sorting[0]?.desc ? 'desc' : 'asc'}
-          onChange={(e) => {
-            const currentId = sorting[0]?.id || 'date';
-            setSorting([{ id: currentId, desc: e.target.value === 'desc' }]);
-          }}
-          size="small"
-          sx={{
-            minWidth: 100,
-            "& .MuiOutlinedInput-root": {
-              bgcolor: alpha("#ffffff", 0.05),
-            },
-          }}
-        >
-          <MenuItem value="asc">ASC</MenuItem>
-          <MenuItem value="desc">DESC</MenuItem>
-        </TextField>
-        <Button
-          variant="outlined"
-          startIcon={<FilterIcon />}
-          onClick={clearAllFilters}
-          sx={{ minWidth: 100 }}
-        >
-          CLEAR
-        </Button>
-      </Stack>
-
-      {/* Posts Cards */}
-      <Stack spacing={2}>
-        {filteredAndSortedPosts.map((post) => {
-          const category = getPostCategory(post.id.toString());
-
-          return (
-            <Card
-              key={post.id}
-              sx={{
-                display: "flex",
-                bgcolor: "background.paper",
-                border: 1,
-                borderColor: "divider",
-                "&:hover": {
-                  borderColor: "primary.main",
-                  bgcolor: alpha("#1DB584", 0.02),
-                },
-                transition: "all 0.2s",
-              }}
-            >
-              {/* Post Image */}
-              <CardMedia
-                component="img"
-                sx={{
-                  width: 120,
-                  height: 120,
-                  objectFit: "cover",
-                }}
-                image={getPostImage(post.id.toString())}
-                alt={post.title}
-              />
-
-              {/* Content */}
-              <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <Box sx={{ flex: 1, mr: 2 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                      {post.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      {post.content || "Exploring how LLMs are reshaping the UI/UX landscape..."}
-                    </Typography>
-
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Avatar
-                        sx={{
-                          width: 32,
-                          height: 32,
-                          bgcolor: "primary.main",
-                          fontSize: "0.875rem",
-                        }}
-                      >
-                        JC
-                      </Avatar>
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          Jane Cooper
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {formatDate(post.createdAt || new Date().toISOString())}
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </Box>
-
-                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
-                    {/* Category Badge */}
-                    <Chip
-                      label={category.name}
-                      size="small"
-                      sx={{
-                        bgcolor: category.color,
-                        color: "white",
-                        fontWeight: 600,
-                        fontSize: "0.75rem",
-                      }}
-                    />
-
-                    {/* Actions */}
-                    <Stack direction="row" spacing={1}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleViewPost(post.id)}
-                        sx={{
-                          "&:hover": { bgcolor: alpha("#4ECDC4", 0.1) },
-                        }}
-                      >
-                        <ViewIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEditPost(post)}
-                        sx={{
-                          "&:hover": { bgcolor: alpha("#1DB584", 0.1) },
-                        }}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        sx={{
-                          "&:hover": { bgcolor: alpha("#FF6B6B", 0.1) },
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Stack>
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </Stack>
-
-      {/* Pagination Footer */}
-      <Box sx={{ mt: 4, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Typography variant="body2" color="text.secondary">
-          ROWS PER PAGE: {pagination.pageSize}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          1-{Math.min(pagination.pageSize, filteredAndSortedPosts.length)} OF {filteredAndSortedPosts.length}
-        </Typography>
-      </Box>
+      {/* Material React Table */}
+      <MaterialReactTable table={table} />
 
       {/* Drawer */}
       <PostsDrawer
