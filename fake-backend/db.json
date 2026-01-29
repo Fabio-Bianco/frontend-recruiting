@@ -117,13 +117,6 @@
   ],
   "posts": [
     {
-      "id": "1",
-      "userId": 2,
-      "title": "Introduzione a React",
-      "content": "Guida completa per iniziare con React.js e i suoi componenti",
-      "createdAt": "2025-01-18T09:30:00Z"
-    },
-    {
       "id": "2",
       "userId": 3,
       "title": "JavaScript ES6+",

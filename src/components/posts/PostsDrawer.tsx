@@ -111,7 +111,7 @@ const [errorMsg, setErrorMsg] = useState<string | null>(null);
       return;
     }
    // Payload comune a create/edit
-   const playLoad = {
+   const payload = {
     userId: userIdNumber,
     title: postTitle.trim(),
     content: content.trim(),
@@ -124,9 +124,9 @@ const [errorMsg, setErrorMsg] = useState<string | null>(null);
     let savedPost: Post;
 
     if (mode === "create") {
-      savedPost = await createPost(playLoad);
+      savedPost = await createPost(payload);
     } else {
-      savedPost = await updatePost(String(initialPost!.id), playLoad);
+      savedPost = await updatePost(String(initialPost!.id), payload);
     }
      // Comunica al padre che il salvataggio è riuscito
       onSaved(savedPost);

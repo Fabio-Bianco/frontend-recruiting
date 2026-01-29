@@ -117,21 +117,30 @@ export function getUsersColumns({
         <Stack direction="row" spacing={0.5}>
           <IconButton
             size="small"
-            onClick={() => onView(row.original.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onView(row.original.id);
+            }}
             sx={{ "&:hover": { bgcolor: alpha("#4ECDC4", 0.1) } }}
           >
             <ViewIcon fontSize="small" />
           </IconButton>
           <IconButton
             size="small"
-            onClick={() => onEdit(row.original)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(row.original);
+            }}
             sx={{ "&:hover": { bgcolor: alpha("#1DB584", 0.1) } }}
           >
             <EditIcon fontSize="small" />
           </IconButton>
           <IconButton
             size="small"
-            onClick={() => onDelete(row.original.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(row.original.id);
+            }}
             sx={{ "&:hover": { bgcolor: alpha("#FF6B6B", 0.1) } }}
           >
             <DeleteIcon fontSize="small" />
