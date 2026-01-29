@@ -19,6 +19,8 @@ export default function UsersList() {
   const navigate = useNavigate();
 
   const { drawerOpen, drawerMode, selectedUser, openCreate, openEdit, close } = useUsersDrawer();
+
+  // Stato della tabella persistente
   const [tableState, setTableState] = useTableState("usersTableState.v1");
 
   async function fetchUsers() {
@@ -65,14 +67,21 @@ export default function UsersList() {
     []
   );
 
+  // Configurazione della tabella con Material React Table e stato persistente
   const table = useMaterialReactTable({
     columns,
     data: users,
-    state: { 
-      ...tableState,
-      isLoading: loading 
+    state: {
+      pagination: tableState.pagination,
+      sorting: tableState.sorting,
+      columnFilters: tableState.columnFilters,
+      globalFilter: tableState.globalFilter,
+      isLoading: loading,
     },
+
+
     // Callback corretti per Material React Table
+
     onPaginationChange: (updater) => {
       const newPagination = typeof updater === 'function' 
         ? updater(tableState.pagination || { pageIndex: 0, pageSize: 10 }) 

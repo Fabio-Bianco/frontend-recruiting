@@ -20,6 +20,8 @@ export default function PostsList() {
   const navigate = useNavigate();
 
   const { drawerOpen, drawerMode, selectedPost, openCreate, openEdit, close } = usePostsDrawer();
+  
+  // Stato della tabella persistente
   const [tableState, setTableState] = useTableState("postsTableState.v1");
 
   async function fetchPosts() {
@@ -69,11 +71,14 @@ export default function PostsList() {
   const table = useMaterialReactTable({
     columns,
     data: posts,
-    state: { 
-      ...tableState,
-      isLoading: loading 
+    state: {
+      pagination: tableState.pagination,
+      sorting: tableState.sorting,
+      columnFilters: tableState.columnFilters,
+      globalFilter: tableState.globalFilter,
+      isLoading: loading,
     },
-    // Callback corretti per Material React Table
+    // Callback per Material React Table
     onPaginationChange: (updater) => {
       const newPagination = typeof updater === 'function' 
         ? updater(tableState.pagination || { pageIndex: 0, pageSize: 10 }) 
