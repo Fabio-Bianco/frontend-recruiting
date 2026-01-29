@@ -3,12 +3,15 @@ import { Edit as EditIcon, Delete as DeleteIcon, Visibility as ViewIcon } from "
 import type { MRT_ColumnDef } from "material-react-table";
 import type { User } from "../../types/user";
 
+
+// Definisce le colonne della tabella utenti con azioni di modifica, eliminazione e visualizzazione
 type UserColumns = {
   onEdit: (user: User) => void;
   onDelete: (userId: number) => void;
   onView: (userId: number) => void;
 };
 
+// Funzione per ottenere le definizioni delle colonne della tabella utenti
 export function getUsersColumns({ onEdit, onDelete, onView }: UserColumns): MRT_ColumnDef<User>[] {
   return [
     {

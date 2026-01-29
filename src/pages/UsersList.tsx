@@ -1,8 +1,10 @@
+// src/pages/UsersList.tsx
+// Pagina per visualizzare la lista degli utenti con funzionalità di CRUD e stato della tabella persistente
+
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
-
 import { useTableState } from "../hook/useTableState";
 import { getUsers, deleteUser } from "../api/users.api";
 import UsersDrawer from "../components/users/UsersDrawer";
@@ -10,13 +12,14 @@ import type { User } from "../types/user";
 import { useUsersDrawer } from "../hook/useUsersDrawer";
 import { getUsersColumns } from "../components/users/users.columns";
 
+// Componente principale per la pagina degli utenti
 export default function UsersList() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const { drawerOpen, drawerMode, selectedUser, openCreate, openEdit, close } = useUsersDrawer();
-  const { pagination, sorting, columnFilters, globalFilter, setPagination, setSorting, setColumnFilters, setGlobalFilter } = useTableState("usersTableState.v1");
+  const [tableState, setTableState] = useTableState("usersTableState.v1");
 
   async function fetchUsers() {
     setLoading(true);
@@ -65,11 +68,32 @@ export default function UsersList() {
   const table = useMaterialReactTable({
     columns,
     data: users,
-    state: { pagination, sorting, columnFilters, globalFilter, isLoading: loading },
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
+    state: { 
+      ...tableState,
+      isLoading: loading 
+    },
+    // Callback corretti per Material React Table
+    onPaginationChange: (updater) => {
+      const newPagination = typeof updater === 'function' 
+        ? updater(tableState.pagination || { pageIndex: 0, pageSize: 10 }) 
+        : updater;
+      setTableState({ ...tableState, pagination: newPagination });
+    },
+    onSortingChange: (updater) => {
+      const newSorting = typeof updater === 'function' 
+        ? updater(tableState.sorting || []) 
+        : updater;
+      setTableState({ ...tableState, sorting: newSorting });
+    },
+    onColumnFiltersChange: (updater) => {
+      const newFilters = typeof updater === 'function' 
+        ? updater(tableState.columnFilters || []) 
+        : updater;
+      setTableState({ ...tableState, columnFilters: newFilters });
+    },
+    onGlobalFilterChange: (value) => {
+      setTableState({ ...tableState, globalFilter: value });
+    },
     enableGlobalFilter: true,
     enableColumnFilters: true,
     enableSorting: true,

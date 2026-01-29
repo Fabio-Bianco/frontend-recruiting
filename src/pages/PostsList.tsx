@@ -1,8 +1,11 @@
+// src/pages/PostsList.tsx
+// Pagina per visualizzare la lista dei post con funzionalità di CRUD e stato della tabella persistente
+
+
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
-
 import { useTableState } from "../hook/useTableState";
 import { getPosts, deletePost } from "../api/posts.api";
 import PostsDrawer from "../components/posts/PostsDrawer";
@@ -10,13 +13,14 @@ import type { Post } from "../types/post";
 import { usePostsDrawer } from "../hook/usePostsDrawer";
 import { getPostsColumns } from "../components/posts/posts.colums";
 
+// Componente principale per la pagina dei post
 export default function PostsList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const { drawerOpen, drawerMode, selectedPost, openCreate, openEdit, close } = usePostsDrawer();
-  const { pagination, sorting, columnFilters, globalFilter, setPagination, setSorting, setColumnFilters, setGlobalFilter } = useTableState("postsTableState.v1");
+  const [tableState, setTableState] = useTableState("postsTableState.v1");
 
   async function fetchPosts() {
     setLoading(true);
@@ -65,11 +69,32 @@ export default function PostsList() {
   const table = useMaterialReactTable({
     columns,
     data: posts,
-    state: { pagination, sorting, columnFilters, globalFilter, isLoading: loading },
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
+    state: { 
+      ...tableState,
+      isLoading: loading 
+    },
+    // Callback corretti per Material React Table
+    onPaginationChange: (updater) => {
+      const newPagination = typeof updater === 'function' 
+        ? updater(tableState.pagination || { pageIndex: 0, pageSize: 10 }) 
+        : updater;
+      setTableState({ ...tableState, pagination: newPagination });
+    },
+    onSortingChange: (updater) => {
+      const newSorting = typeof updater === 'function' 
+        ? updater(tableState.sorting || []) 
+        : updater;
+      setTableState({ ...tableState, sorting: newSorting });
+    },
+    onColumnFiltersChange: (updater) => {
+      const newFilters = typeof updater === 'function' 
+        ? updater(tableState.columnFilters || []) 
+        : updater;
+      setTableState({ ...tableState, columnFilters: newFilters });
+    },
+    onGlobalFilterChange: (value) => {
+      setTableState({ ...tableState, globalFilter: value });
+    },
     enableGlobalFilter: true,
     enableColumnFilters: true,
     enableSorting: true,

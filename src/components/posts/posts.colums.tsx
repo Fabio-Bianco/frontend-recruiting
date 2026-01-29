@@ -3,12 +3,15 @@ import { Edit as EditIcon, Delete as DeleteIcon, Visibility as ViewIcon } from "
 import type { MRT_ColumnDef } from "material-react-table";
 import type { Post } from "../../types/post";
 
+
+// Definisce le colonne della tabella post con azioni di modifica, eliminazione e visualizzazione
 type PostColumns = {
   onEdit: (post: Post) => void;
   onDelete: (postId: number) => void;
   onView: (postId: number) => void;
 };
 
+// Funzione per ottenere le definizioni delle colonne della tabella post
 export function getPostsColumns({ onEdit, onDelete, onView }: PostColumns): MRT_ColumnDef<Post>[] {
   return [
     {

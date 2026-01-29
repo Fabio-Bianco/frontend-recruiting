@@ -1,48 +1,35 @@
-/**
-  Contiene:
-- Form con email/password
-- Chiamata API fake per autenticazione
-- Gestione errori login
-- Redirect dopo login riuscito
- */
-
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import { useAuth } from "../auth/AuthContext";
 
+// Componente principale per la pagina di login
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // ✅ se arrivi da una rotta protetta, ti rimanda lì dopo login
-  const from = (location.state as any)?.from?.pathname || "/";
-
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [submitting, setSubmitting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-async function handleSubmit(e: React.FormEvent) {
-  e.preventDefault();
-  setSubmitting(true);
 
-  const ok = await login(email, password);
+  // Gestisce il submit del form di login 
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    setSubmitting(true);
 
-  if (!ok) {
-    setErrorMsg("Credenziali non valide.");
+    const ok = await login(email, password);
+
+    if (ok) {
+      navigate("/");
+    }
+    
     setSubmitting(false);
-    return;
   }
 
-  navigate(from, { replace: true });
-}
-
   return (
-    <Box sx={{ maxWidth: 420, mx: "auto", mt: 8 }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>
+    <Box sx={{ maxWidth: 400, mx: "auto", mt: 8, p: 3 }}>
+      <Typography variant="h4" sx={{ mb: 3 }}>
         Login
       </Typography>
 
@@ -52,7 +39,6 @@ async function handleSubmit(e: React.FormEvent) {
             label="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
             required
           />
 
@@ -61,15 +47,8 @@ async function handleSubmit(e: React.FormEvent) {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
             required
           />
-
-          {errorMsg && (
-            <Typography color="error" variant="body2">
-              {errorMsg}
-            </Typography>
-          )}
 
           <Button type="submit" variant="contained" disabled={submitting}>
             {submitting ? "Accesso..." : "Accedi"}
