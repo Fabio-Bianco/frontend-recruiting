@@ -8,10 +8,10 @@ type AuthContextValue = {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
 };
-
+//contesto per auth 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// ✅ sessionStorage: dura finché la tab è aperta (perfetto per case study)
+// sessionStorage: dura finché la tab è aperta 
 const AUTH_STORAGE_KEY = "auth.user.v1";
 
 function readUserFromSession(): User | null {
@@ -33,7 +33,7 @@ function writeUserToSession(user: User | null) {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // ✅ init da sessionStorage => refresh non “slocca”
+  // init da sessionStorage => refresh non “slocca”
   const [user, setUser] = useState<User | null>(() => readUserFromSession());
 
   const value = useMemo<AuthContextValue>(() => {
