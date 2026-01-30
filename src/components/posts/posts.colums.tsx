@@ -1,4 +1,4 @@
-import { Stack, Button, Typography, IconButton } from "@mui/material";
+import { Stack, Typography, IconButton } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon, Visibility as ViewIcon } from "@mui/icons-material";
 import type { MRT_ColumnDef } from "material-react-table";
 import type { Post } from "../../types/post";
