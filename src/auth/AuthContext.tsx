@@ -1,3 +1,7 @@
+// src/auth/AuthContext.tsx
+
+// Contesto per autenticazione utente
+
 import React, { createContext, useContext, useMemo, useState } from "react";
 import type { User } from "../types/user"; 
 import { loginUser  } from "../api/users.api"; 
@@ -31,9 +35,9 @@ function writeUserToSession(user: User | null) {
     // ignora errori storage
   }
 }
-
+//componente provider per auth
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // init da sessionStorage => refresh non “slocca”
+  
   const [user, setUser] = useState<User | null>(() => readUserFromSession());
 
   const value = useMemo<AuthContextValue>(() => {
